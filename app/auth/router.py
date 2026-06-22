@@ -28,7 +28,8 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 async def register(payload: UserCreate, db: Session = Depends(get_db)):
     """Registra um novo usuário com perfil **professional**.
 
-    O username e email devem ser únicos. A senha é armazenada de forma segura (hash bcrypt).
+    O username e email devem ser unicos. A senha e armazenada de forma
+    segura (hash bcrypt).
     """
     if db.query(User).filter(User.username == payload.username).first():
         raise HTTPException(status_code=409, detail="Username ja existe")

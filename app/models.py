@@ -17,7 +17,9 @@ class DiagnosisHistory(Base):
     leucocitos = Column("leucocitos", Integer, nullable=False)
     neutrofilia = Column("neutrofilia", Boolean, nullable=False)
     alvarado_score = Column("score_alvarado", Integer, nullable=False)
-    alvarado_classificacao = Column("classificacao_alvarado", String(20), nullable=False)
+    alvarado_classificacao = Column(
+        "classificacao_alvarado", String(20), nullable=False
+    )
     predicao_knn = Column("predicao_knn", Integer, nullable=True)
     probabilidade_knn = Column("probabilidade_knn", Float, nullable=True)
     confianca_knn = Column("confianca_knn", String(20), nullable=False)

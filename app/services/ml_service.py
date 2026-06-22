@@ -20,15 +20,20 @@ MAPA_SPEC_PARA_DATASET = {
 
 
 def _mapear_features_para_dataset(dados: dict) -> dict:
+    def _valor(v):
+        return 1 if dados.get(v) else 0
+
     return {
-        MAPA_SPEC_PARA_DATASET["dor_migratoria"]: 1 if dados.get("dor_migratoria") else 0,
-        MAPA_SPEC_PARA_DATASET["anorexia"]: 1 if dados.get("anorexia") else 0,
-        MAPA_SPEC_PARA_DATASET["nauseas_vomitos"]: 1 if dados.get("nauseas_vomitos") else 0,
-        MAPA_SPEC_PARA_DATASET["dor_fid"]: 1 if dados.get("dor_fid") else 0,
-        MAPA_SPEC_PARA_DATASET["descompressao_dolorosa"]: 1 if dados.get("descompressao_dolorosa") else 0,
+        MAPA_SPEC_PARA_DATASET["dor_migratoria"]: _valor("dor_migratoria"),
+        MAPA_SPEC_PARA_DATASET["anorexia"]: _valor("anorexia"),
+        MAPA_SPEC_PARA_DATASET["nauseas_vomitos"]: _valor("nauseas_vomitos"),
+        MAPA_SPEC_PARA_DATASET["dor_fid"]: _valor("dor_fid"),
+        MAPA_SPEC_PARA_DATASET["descompressao_dolorosa"]: _valor(
+            "descompressao_dolorosa"
+        ),
         MAPA_SPEC_PARA_DATASET["temperatura"]: float(dados.get("temperatura", 36.5)),
         MAPA_SPEC_PARA_DATASET["leucocitos"]: float(dados.get("leucocitos", 8000)),
-        MAPA_SPEC_PARA_DATASET["neutrofilia"]: 1 if dados.get("neutrofilia") else 0,
+        MAPA_SPEC_PARA_DATASET["neutrofilia"]: _valor("neutrofilia"),
         "Contralateral_Rebound_Tenderness": 0,
     }
 

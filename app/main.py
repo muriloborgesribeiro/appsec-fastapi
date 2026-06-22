@@ -50,19 +50,25 @@ async def lifespan(app: FastAPI):
 tags_metadata = [
     {
         "name": "auth",
-        "description": "Autenticação e gerenciamento de usuários. Registro, login e consulta de perfil.",
+        "description": "Autenticação e gerenciamento de usuários. "
+        "Registro, login e consulta de perfil.",
     },
     {
         "name": "diagnosticos",
-        "description": "Diagnósticos de apendicite utilizando Escala de Alvarado, KNN e SVM. Operações de criação, listagem, consulta e remoção.",
+        "description": "Diagnósticos de apendicite utilizando "
+        "Escala de Alvarado, KNN e SVM. "
+        "Operações de criação, listagem, consulta e remoção.",
     },
     {
         "name": "metricas",
-        "description": "Métricas de desempenho dos modelos de Machine Learning (Acurácia, Precisão, Recall, F1-Score, matriz de confusão).",
+        "description": "Métricas de desempenho dos modelos de Machine Learning "
+        "(Acurácia, Precisão, Recall, F1-Score, matriz de confusão).",
     },
     {
         "name": "duvidas",
-        "description": "Tira duvidas sobre o projeto usando RAG + Groq. Envia uma pergunta em linguagem natural e recebe resposta baseada na documentação.",
+        "description": "Tira duvidas sobre o projeto usando RAG + Groq. "
+        "Envia uma pergunta em linguagem natural e recebe resposta "
+        "baseada na documentação.",
     },
     {
         "name": "health",
@@ -72,16 +78,20 @@ tags_metadata = [
 
 app = FastAPI(
     title="APPSPEC API — Sistema de Apoio ao Diagnóstico de Apendicite",
-    description="Backend API para o Sistema de Apoio ao Diagnóstico de Apendicite — UFG.\n\n"
-    "Combina o escore clínico **Alvarado** com dois modelos de **Machine Learning** "
-    "(KNN e SVM) treinados no dataset *Regensburg Pediatric Appendicitis* (UCI).\n\n"
+    description="Backend API para o Sistema de Apoio ao "
+    "Diagnóstico de Apendicite — UFG.\n\n"
+    "Combina o escore clínico **Alvarado** com dois modelos de "
+    "**Machine Learning** (KNN e SVM) treinados no dataset "
+    "*Regensburg Pediatric Appendicitis* (UCI).\n\n"
     "## Autenticação\n\n"
     "A API utiliza **JWT Bearer Token**. Para acessar endpoints protegidos:\n"
     "1. Faça login em `POST /auth/login` com usuário e senha\n"
     "2. Copie o `access_token` retornado\n"
-    "3. Clique no botão **Authorize** (canto superior direito) e insira o token no formato `Bearer <token>`\n\n"
+    "3. Clique no botão **Authorize** (canto superior direito) e "
+    "insira o token no formato `Bearer <token>`\n\n"
     "## Perfis de Acesso\n\n"
-    "- **admin**: Acesso total (criar, listar, deletar diagnósticos e gerenciar usuários)\n"
+    "- **admin**: Acesso total (criar, listar, deletar "
+    "diagnósticos e gerenciar usuários)\n"
     "- **professional**: Pode criar e listar diagnósticos\n"
     "- **viewer**: Acesso somente leitura (listar diagnósticos e métricas)\n\n"
     "> Projeto didático para a disciplina **Agentes Inteligentes** — UFG.",
@@ -152,7 +162,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/; "
+            "style-src 'self' 'unsafe-inline' "
+            "https://cdn.jsdelivr.net "
+            "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/; "
             "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
             "img-src 'self' data:; "
             "font-src 'self' https://cdn.jsdelivr.net;"
