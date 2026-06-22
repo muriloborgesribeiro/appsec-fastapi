@@ -59,4 +59,5 @@ def require_role(*roles: str):
                 detail="Permissao insuficiente",
             )
         return current_user
+
     return _role_checker
