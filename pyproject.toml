@@ -8,6 +8,9 @@ version = "1.2.0"
 description = "APPSPEC - Sistema de Apoio ao Diagnostico de Apendicite"
 requires-python = ">=3.10"
 
+[tool.setuptools.packages.find]
+include = ["app*", "ml*"]
+
 [tool.ruff]
 line-length = 88
 target-version = "py310"

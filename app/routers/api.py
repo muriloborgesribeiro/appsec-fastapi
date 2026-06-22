@@ -329,7 +329,7 @@ async def metricas_json(
     """Retorna as métricas de desempenho dos modelos KNN e SVM.
 
     As métricas incluem acurácia, precisão, recall, F1-score e matriz de confusão.
-    Execute `python setup.py` para gerar/atualizar as métricas.
+    Execute `python pipeline.py` para gerar/atualizar as métricas.
 
     Requer perfil **admin**, **professional** ou **viewer**.
     """

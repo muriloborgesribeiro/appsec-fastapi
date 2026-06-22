@@ -228,7 +228,7 @@ appsec-fastapi/
 
 ## Pipeline de Dados
 
-### Setup (treino) — `python setup.py`
+### Setup (treino) — `python pipeline.py`
 
 ```
 Baixar dataset (UCI id=938)
@@ -283,7 +283,7 @@ python -m venv .venv
 # ou source .venv/bin/activate  # Linux/macOS
 
 pip install -r requirements.txt
-python setup.py              # treinar modelos (necessário na 1ª vez)
+python pipeline.py              # treinar modelos (necessário na 1ª vez)
 python app/main.py           # iniciar servidor (porta 8082)
 ```
 
@@ -292,7 +292,7 @@ python app/main.py           # iniciar servidor (porta 8082)
 ```bash
 uv venv
 uv pip install -r requirements.txt
-uv run python setup.py
+uv run python pipeline.py
 uv run python app/main.py
 ```
 
