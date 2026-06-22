@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: appspec-backend
+    runtime: python
+    plan: free
+    rootDir: .
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.10"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: CORS_ORIGINS
+        fromService:
+          name: appspec-frontend
+          type: web
+          property: url
+
+  - type: web
+    name: appspec-frontend
+    runtime: python
+    plan: free
+    rootDir: appsec-frontend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.10"
+      - key: BACKEND_URL
+        fromService:
+          name: appspec-backend
+          type: web
+          property: url
+      - key: SECRET_KEY
+        fromService:
+          name: appspec-backend
+          type: web
+          envVarKey: SECRET_KEY

@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "appsec-fastapi"
+version = "1.2.0"
+description = "APPSPEC - Sistema de Apoio ao Diagnostico de Apendicite"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "F",   # Pyflakes: errors
+    "E",   # Pycodestyle: errors
+    "W",   # Pycodestyle: warnings
+    "I",   # isort: import ordering
+    "N",   # pep8-naming
+    "D",   # pydocstyle: docstring conventions
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "ARG", # flake8-unused-arguments
+    "C4",  # flake8-comprehensions
+    "T20", # flake8-print
+]
+ignore = [
+    "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107",
+    "D200", "D205", "D210", "D212", "D213", "D400", "D401", "D402",
+    "D404", "D405", "D406", "D407", "D408", "D409", "D410", "D411",
+    "D412", "D413", "D414", "D415", "D416", "D417",
+    "N802", "N803", "N806", "N815", "N816", "N999",
+    "ARG001", "ARG002", "ARG003", "ARG004", "ARG005",
+    "T201",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D", "N"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.mypy]
+strict = false
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+disallow_untyped_defs = false
+check_untyped_defs = false

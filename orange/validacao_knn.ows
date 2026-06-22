@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scheme version="2.0"
+        title="APPSPEC - Validacao KNN (Apendicite)"
+        description="Workflow Orange3 gerado automaticamente pelo setup.py do APPSPEC.
+Disciplina: Agentes Inteligentes - UFG - Prof. Ronaldo Martins da Costa.
+Pipeline: Dataset Regensburg -> Pre-processamento -> KNN -> Matriz de Confusao.
+Tecnologia: Orange3 (validacao visual no-code, ensinada na disciplina).">
+    <nodes>
+        <node id="0" name="CSV File Import" qualified_name="Orange.widgets.data.owcsvimport.OWCSVFileImport"
+              position="(150, 300)" title="Dataset Regensburg" />
+        <node id="1" name="Select Columns" qualified_name="Orange.widgets.data.owselectcolumns.OWSelectAttributes"
+              position="(350, 300)" title="Selecionar Features" />
+        <node id="2" name="Data Sampler" qualified_name="Orange.widgets.data.owdatasampler.OWDataSampler"
+              position="(550, 300)" title="Split 70/30" />
+        <node id="3" name="kNN" qualified_name="Orange.widgets.model.owknn.OWKNNLearner"
+              position="(550, 150)" title="KNN Learner" />
+        <node id="4" name="Test and Score" qualified_name="Orange.widgets.evaluate.owtestandscore.OWTestAndScore"
+              position="(750, 300)" title="Avaliacao" />
+        <node id="5" name="Confusion Matrix" qualified_name="Orange.widgets.evaluate.owconfusionmatrix.OWConfusionMatrix"
+              position="(950, 300)" title="Matriz de Confusao" />
+    </nodes>
+    <links>
+        <link id="0" source_node_id="0" sink_node_id="1" source_channel="Data" sink_channel="Data" />
+        <link id="1" source_node_id="1" sink_node_id="2" source_channel="Data" sink_channel="Data" />
+        <link id="2" source_node_id="2" sink_node_id="4" source_channel="Data Sample" sink_channel="Data" />
+        <link id="3" source_node_id="3" sink_node_id="4" source_channel="Learner" sink_channel="Learner" />
+        <link id="4" source_node_id="4" sink_node_id="5" source_channel="Evaluation Results" sink_channel="Evaluation Results" />
+    </links>
+    <annotations>
+        <text id="0" rect="(50, 50, 500, 100)">APPSPEC - Workflow de Validacao Visual
+Tecnologia: Orange3 (disciplina de Agentes Inteligentes)
+Dataset: regensburg_processed.csv
+Algoritmo: KNN (K-Nearest Neighbors) - Cover and Hart, 1967</text>
+    </annotations>
+</scheme>
