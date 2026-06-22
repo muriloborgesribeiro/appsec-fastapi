@@ -22,7 +22,7 @@ from app.schemas import (
 from app.services.ml_service import executar_modelos, criar_historico
 from app.auth.dependencies import require_role
 
-router = APIRouter(prefix="/api/v1", tags=["api"])
+router = APIRouter(prefix="/api/v1", tags=["diagnosticos"])
 
 
 def _build_alvarado(alv: dict) -> AlvaradoResult:
@@ -82,10 +82,17 @@ def _build_svm(svm: dict) -> SvmResult:
     "/diagnosticos",
     response_model=DiagnosticoResponse,
     status_code=201,
+    summary="Criar novo diagnóstico",
     responses={
         201: {"description": "Diagnóstico criado com sucesso"},
-        422: {"model": ErrorResponse, "description": "Dados inválidos"},
-        503: {"model": ErrorResponse, "description": "Modelo ML indisponível"},
+        422: {
+            "description": "Dados inválidos — campos fora dos limites permitidos",
+            "model": ErrorResponse,
+        },
+        503: {
+            "description": "Modelo de ML indisponível",
+            "model": ErrorResponse,
+        },
     },
 )
 async def criar_diagnostico(
@@ -93,6 +100,15 @@ async def criar_diagnostico(
     db: Session = Depends(get_db),
     _=Depends(require_role("admin", "professional")),
 ):
+    """Cria um novo diagnóstico de apendicite.
+
+    Executa os três modelos em cascata:
+    1. **Escala de Alvarado** — escore clínico determinístico
+    2. **KNN** — K-Nearest Neighbors
+    3. **SVM** — Support Vector Machine
+
+    Requer perfil **admin** ou **professional**.
+    """
     dados = payload.model_dump()
     resultados = executar_modelos(dados)
     historico = criar_historico(db, dados, resultados)
@@ -113,29 +129,39 @@ async def criar_diagnostico(
 @router.get(
     "/diagnosticos",
     response_model=DiagnosticosListResponse,
-    responses={200: {"description": "Lista de diagnósticos"}},
+    summary="Listar diagnósticos",
+    responses={
+        200: {"description": "Lista paginada de diagnósticos"},
+    },
 )
 async def listar_diagnosticos(
     db: Session = Depends(get_db),
     _=Depends(require_role("admin", "professional", "viewer")),
-    page: int = Query(1, ge=1, description="Número da página"),
-    page_size: int = Query(20, ge=1, le=100, description="Itens por página"),
+    page: int = Query(1, ge=1, description="Número da página (começa em 1)"),
+    page_size: int = Query(20, ge=1, le=100, description="Itens por página (máx. 100)"),
     data_inicio: Optional[str] = Query(
-        None, description="Filtrar por data início (YYYY-MM-DD)"
+        None, description="Filtrar por data início (formato: YYYY-MM-DD)"
     ),
     data_fim: Optional[str] = Query(
-        None, description="Filtrar por data fim (YYYY-MM-DD)"
+        None, description="Filtrar por data fim (formato: YYYY-MM-DD)"
     ),
     classificacao: Optional[str] = Query(
-        None, description="Filtrar por classificação Alvarado"
+        None, description="Filtrar por classificação Alvarado (ex: Alta Probabilidade)"
     ),
     resultado_knn: Optional[str] = Query(
-        None, description="Filtrar por resultado KNN (0/1)"
+        None, description="Filtrar por resultado KNN (0 = negativo, 1 = positivo)"
     ),
     resultado_svm: Optional[str] = Query(
-        None, description="Filtrar por resultado SVM (0/1)"
+        None, description="Filtrar por resultado SVM (0 = negativo, 1 = positivo)"
     ),
 ):
+    """Lista diagnósticos com paginação e filtros.
+
+    Retorna um resumo dos diagnósticos. Para detalhes completos, use o endpoint
+    de consulta individual.
+
+    Requer perfil **admin**, **professional** ou **viewer**.
+    """
     repo = HistoryRepository(db)
     registros, total = repo.list(
         page=page,
@@ -203,9 +229,13 @@ async def listar_diagnosticos(
 @router.get(
     "/diagnosticos/{diagnostico_id}",
     response_model=DiagnosticoResponse,
+    summary="Obter diagnóstico por ID",
     responses={
         200: {"description": "Diagnóstico encontrado"},
-        404: {"model": ErrorResponse, "description": "Diagnóstico não encontrado"},
+        404: {
+            "description": "Diagnóstico não encontrado",
+            "model": ErrorResponse,
+        },
     },
 )
 async def obter_diagnostico(
@@ -213,6 +243,10 @@ async def obter_diagnostico(
     db: Session = Depends(get_db),
     _=Depends(require_role("admin", "professional", "viewer")),
 ):
+    """Retorna os detalhes completos de um diagnóstico específico.
+
+    Requer perfil **admin**, **professional** ou **viewer**.
+    """
     repo = HistoryRepository(db)
     historico = repo.find_by_id_or_404(diagnostico_id)
 
@@ -252,9 +286,13 @@ async def obter_diagnostico(
 @router.delete(
     "/diagnosticos/{diagnostico_id}",
     status_code=204,
+    summary="Remover diagnóstico",
     responses={
-        204: {"description": "Diagnóstico removido"},
-        404: {"model": ErrorResponse, "description": "Diagnóstico não encontrado"},
+        204: {"description": "Diagnóstico removido com sucesso (sem conteúdo)"},
+        404: {
+            "description": "Diagnóstico não encontrado",
+            "model": ErrorResponse,
+        },
     },
 )
 async def deletar_diagnostico(
@@ -262,20 +300,38 @@ async def deletar_diagnostico(
     db: Session = Depends(get_db),
     _=Depends(require_role("admin")),
 ):
+    """Remove um diagnóstico do sistema.
+
+    **Restrito a administradores.** Esta operação é irreversível.
+    """
     repo = HistoryRepository(db)
     repo.delete(diagnostico_id)
 
 
-@router.get(
+metricas_router = APIRouter(prefix="/api/v1", tags=["metricas"])
+
+
+@metricas_router.get(
     "/metricas",
+    summary="Obter métricas dos modelos ML",
     responses={
-        200: {"description": "Métricas dos modelos"},
-        404: {"model": ErrorResponse, "description": "Métricas não encontradas"},
+        200: {"description": "Métricas de desempenho dos modelos"},
+        404: {
+            "description": "Arquivo de métricas não encontrado",
+            "model": ErrorResponse,
+        },
     },
 )
 async def metricas_json(
     _=Depends(require_role("admin", "professional", "viewer")),
 ):
+    """Retorna as métricas de desempenho dos modelos KNN e SVM.
+
+    As métricas incluem acurácia, precisão, recall, F1-score e matriz de confusão.
+    Execute `python setup.py` para gerar/atualizar as métricas.
+
+    Requer perfil **admin**, **professional** ou **viewer**.
+    """
     if not os.path.exists(METRICAS_PATH):
         raise HTTPException(
             status_code=404,

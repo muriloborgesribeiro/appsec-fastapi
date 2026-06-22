@@ -6,12 +6,30 @@ from app.auth.models import User
 from app.auth.schemas import UserCreate, UserResponse, LoginRequest, Token
 from app.auth.utils import hash_password, verify_password, create_access_token
 from app.auth.dependencies import get_current_user, require_role
+from app.schemas import ErrorResponse
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/register", response_model=UserResponse, status_code=201)
+@router.post(
+    "/register",
+    response_model=UserResponse,
+    status_code=201,
+    summary="Registrar novo usuário",
+    responses={
+        201: {"description": "Usuário criado com sucesso"},
+        409: {
+            "description": "Conflito — usuário ou e-mail já existe",
+            "model": ErrorResponse,
+        },
+    },
+    openapi_extra={"security": []},
+)
 async def register(payload: UserCreate, db: Session = Depends(get_db)):
+    """Registra um novo usuário com perfil **professional**.
+
+    O username e email devem ser únicos. A senha é armazenada de forma segura (hash bcrypt).
+    """
     if db.query(User).filter(User.username == payload.username).first():
         raise HTTPException(status_code=409, detail="Username ja existe")
     if db.query(User).filter(User.email == payload.email).first():
@@ -29,8 +47,29 @@ async def register(payload: UserCreate, db: Session = Depends(get_db)):
     return user
 
 
-@router.post("/login", response_model=Token)
+@router.post(
+    "/login",
+    response_model=Token,
+    summary="Autenticar usuário",
+    responses={
+        200: {"description": "Login realizado com sucesso, retorna token JWT"},
+        401: {
+            "description": "Credenciais inválidas",
+            "model": ErrorResponse,
+        },
+        403: {
+            "description": "Usuário inativo",
+            "model": ErrorResponse,
+        },
+    },
+    openapi_extra={"security": []},
+)
 async def login(payload: LoginRequest, db: Session = Depends(get_db)):
+    """Autentica o usuário e retorna um **token JWT** de acesso.
+
+    O token deve ser enviado no header `Authorization: Bearer <token>` para acessar
+    os endpoints protegidos.
+    """
     user = db.query(User).filter(User.username == payload.username).first()
     if not user or not verify_password(payload.password, user.hashed_password):  # type: ignore[arg-type]
         raise HTTPException(
@@ -46,14 +85,38 @@ async def login(payload: LoginRequest, db: Session = Depends(get_db)):
     return Token(access_token=token)
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get(
+    "/me",
+    response_model=UserResponse,
+    summary="Obter dados do usuário atual",
+    responses={
+        200: {"description": "Dados do usuário autenticado"},
+        401: {"description": "Token não fornecido ou inválido"},
+    },
+)
 async def me(current_user: User = Depends(get_current_user)):
+    """Retorna os dados do usuário atualmente autenticado.
+
+    Requer token JWT válido no header `Authorization`.
+    """
     return current_user
 
 
-@router.get("/users", response_model=list[UserResponse])
+@router.get(
+    "/users",
+    response_model=list[UserResponse],
+    summary="Listar todos os usuários",
+    responses={
+        200: {"description": "Lista de usuários cadastrados"},
+        403: {"description": "Acesso restrito a administradores"},
+    },
+)
 async def list_users(
     _: User = Depends(require_role("admin")),
     db: Session = Depends(get_db),
 ):
+    """Lista todos os usuários cadastrados no sistema.
+
+    **Restrito a administradores.** Retorna dados públicos dos usuários.
+    """
     return db.query(User).all()
