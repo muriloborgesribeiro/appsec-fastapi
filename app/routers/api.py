@@ -113,7 +113,7 @@ async def criar_diagnostico(
     resultados = executar_modelos(dados)
     historico = criar_historico(db, dados, resultados)
 
-    return DiagnosticoResponse(
+    return DiagnosticoResponse(  # type: ignore[arg-type]
         id=historico.id,  # type: ignore[arg-type]
         **dados,
         alvarado=_build_alvarado(resultados["alvarado"]),
@@ -250,7 +250,7 @@ async def obter_diagnostico(
     repo = HistoryRepository(db)
     historico = repo.find_by_id_or_404(diagnostico_id)
 
-    return DiagnosticoResponse(
+    return DiagnosticoResponse(  # type: ignore[arg-type]
         id=historico.id,  # type: ignore[arg-type]
         dor_migratoria=historico.dor_migratoria,  # type: ignore[arg-type]
         anorexia=historico.anorexia,  # type: ignore[arg-type]

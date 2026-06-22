@@ -70,7 +70,7 @@ def _carregar_chunks() -> list[dict]:
 
 
 class DocumentStore:
-    def __init__(self):
+    def __init__(self) -> None:
         self._vectorizer: TfidfVectorizer | None = None
         self._matrix: np.ndarray | None = None
         self._chunks: list[dict] = []
