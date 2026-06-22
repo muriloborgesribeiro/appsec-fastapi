@@ -37,17 +37,19 @@ async def perguntar(
 
     Requer perfil **admin**, **professional** ou **viewer**.
     """
-    try:
-        store = get_document_store()
-        chunks = store.buscar(payload.pergunta)
+    store = get_document_store()
+    chunks = store.buscar(payload.pergunta)
 
-        if not chunks or chunks[0]["score"] < RAG_SIMILARIDADE_MINIMA:
-            raise HTTPException(
-                status_code=400,
-                detail="Sua pergunta não tem relação com o projeto APPSPEC. "
-                "Tire dúvidas sobre o sistema, os modelos de ML, "
-                "a API ou a documentação.",
-            )
+    if not chunks or chunks[0]["score"] < RAG_SIMILARIDADE_MINIMA:
+        return DuvidaResponse(
+            pergunta=payload.pergunta,
+            resposta="A pergunta não tem relação com o escopo do projeto. "
+            "Faça uma pergunta pertinente.",
+            contexto_utilizado=[],
+            modelo=GROQ_MODEL,
+        )
+
+    try:
         contexto_info = []
         for c in chunks:
             texto_resumido = c["texto"][:80].replace("\n", " ").strip()
