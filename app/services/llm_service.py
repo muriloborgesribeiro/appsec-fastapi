@@ -1,4 +1,4 @@
-from openai import OpenAI
+from openai import OpenAI, APITimeoutError
 
 from app.config import GROQ_API_KEY, GROQ_BASE_URL, GROQ_MODEL, RAG_TEMPERATURE
 
@@ -39,7 +39,7 @@ def gerar_resposta(pergunta: str, chunks: list[dict]) -> str:
     if not GROQ_API_KEY:
         raise RuntimeError("GROQ_API_KEY nao configurada")
 
-    client = OpenAI(api_key=GROQ_API_KEY, base_url=GROQ_BASE_URL)
+    client = OpenAI(api_key=GROQ_API_KEY, base_url=GROQ_BASE_URL, timeout=60.0)
     prompt = _montar_prompt(pergunta, chunks)
 
     resposta = client.chat.completions.create(

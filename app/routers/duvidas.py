@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from openai import APITimeoutError
 
 from app.auth.dependencies import require_role
 from app.config import GROQ_MODEL
@@ -54,6 +55,11 @@ async def perguntar(
         )
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e)) from e
+    except APITimeoutError:
+        raise HTTPException(
+            status_code=503,
+            detail="O servico de IA esta demorando mais que o esperado. Tente novamente.",
+        ) from None
     except Exception:
         raise HTTPException(
             status_code=503,
