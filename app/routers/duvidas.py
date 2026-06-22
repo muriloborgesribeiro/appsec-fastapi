@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from openai import APITimeoutError
 
 from app.auth.dependencies import require_role
-from app.config import GROQ_MODEL
+from app.config import GROQ_MODEL, RAG_SIMILARIDADE_MINIMA
 from app.schemas import DuvidaRequest, DuvidaResponse, ErrorResponse
 from app.services.llm_service import gerar_resposta
 from app.services.rag_service import get_document_store
@@ -13,15 +13,15 @@ router = APIRouter(prefix="/api/v1", tags=["duvidas"])
 @router.post(
     "/duvidas",
     response_model=DuvidaResponse,
-    summary="Tirar duvida sobre o projeto",
+    summary="Tirar dúvida sobre o projeto",
     responses={
         200: {"description": "Pergunta respondida com sucesso"},
         400: {
-            "description": "Pergunta invalida",
+            "description": "Pergunta inválida",
             "model": ErrorResponse,
         },
         503: {
-            "description": "Servico de IA indisponivel",
+            "description": "Serviço de IA indisponível",
             "model": ErrorResponse,
         },
     },
@@ -40,6 +40,14 @@ async def perguntar(
     try:
         store = get_document_store()
         chunks = store.buscar(payload.pergunta)
+
+        if not chunks or chunks[0]["score"] < RAG_SIMILARIDADE_MINIMA:
+            raise HTTPException(
+                status_code=400,
+                detail="Sua pergunta não tem relação com o projeto APPSPEC. "
+                "Tire dúvidas sobre o sistema, os modelos de ML, "
+                "a API ou a documentação.",
+            )
         contexto_info = []
         for c in chunks:
             texto_resumido = c["texto"][:80].replace("\n", " ").strip()
@@ -58,10 +66,10 @@ async def perguntar(
     except APITimeoutError:
         raise HTTPException(
             status_code=503,
-            detail="O servico de IA esta demorando mais que o esperado. Tente novamente.",
+            detail="O serviço de IA esta demorando mais que o esperado. Tente novamente.",
         ) from None
     except Exception:
         raise HTTPException(
             status_code=503,
-            detail="Servico de IA temporariamente indisponivel",
+            detail="Serviço de IA temporariamente indisponível",
         ) from None
