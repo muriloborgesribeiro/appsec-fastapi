@@ -4,18 +4,24 @@ from typing import Optional
 
 # ── Request ─────────────────────────────────────────────────
 
+
 class DiagnosticoRequest(BaseModel):
     dor_migratoria: bool = Field(..., description="Dor migratória para FID")
     anorexia: bool = Field(..., description="Perda de apetite")
     nauseas_vomitos: bool = Field(..., description="Náuseas ou vômitos")
     dor_fid: bool = Field(..., description="Dor à palpação em FID")
     descompressao_dolorosa: bool = Field(..., description="Sinal de Blumberg")
-    temperatura: float = Field(..., ge=35.0, le=42.0, description="Temperatura axilar em °C")
-    leucocitos: float = Field(..., ge=1000, le=50000, description="Leucócitos totais /mm³")
+    temperatura: float = Field(
+        ..., ge=35.0, le=42.0, description="Temperatura axilar em °C"
+    )
+    leucocitos: float = Field(
+        ..., ge=1000, le=50000, description="Leucócitos totais /mm³"
+    )
     neutrofilia: bool = Field(..., description="Neutrofilia (>75%)")
 
 
 # ── HATEOAS ─────────────────────────────────────────────────
+
 
 class Link(BaseModel):
     href: str
@@ -24,6 +30,7 @@ class Link(BaseModel):
 
 
 # ── Alvarado ────────────────────────────────────────────────
+
 
 class AlvaradoDetalhe(BaseModel):
     criterio: str
@@ -48,6 +55,7 @@ class AlvaradoResult(BaseModel):
 
 # ── KNN ─────────────────────────────────────────────────────
 
+
 class KnnResult(BaseModel):
     classe_predita: Optional[int] = None
     label_predita: Optional[str] = None
@@ -65,6 +73,7 @@ class KnnResult(BaseModel):
 
 
 # ── SVM ─────────────────────────────────────────────────────
+
 
 class SvmResult(BaseModel):
     classe_predita: Optional[int] = None
@@ -84,8 +93,17 @@ class SvmResult(BaseModel):
 
 # ── Responses ───────────────────────────────────────────────
 
+
 class DiagnosticoResponse(BaseModel):
     id: int
+    dor_migratoria: bool
+    anorexia: bool
+    nauseas_vomitos: bool
+    dor_fid: bool
+    descompressao_dolorosa: bool
+    temperatura: float
+    leucocitos: float
+    neutrofilia: bool
     alvarado: AlvaradoResult
     knn: KnnResult
     svm: SvmResult
@@ -95,6 +113,14 @@ class DiagnosticoResponse(BaseModel):
 class DiagnosticoSummary(BaseModel):
     id: int
     created_at: Optional[str] = None
+    dor_migratoria: Optional[bool] = None
+    anorexia: Optional[bool] = None
+    nauseas_vomitos: Optional[bool] = None
+    dor_fid: Optional[bool] = None
+    descompressao_dolorosa: Optional[bool] = None
+    temperatura: Optional[float] = None
+    leucocitos: Optional[float] = None
+    neutrofilia: Optional[bool] = None
     alvarado_score: Optional[int] = None
     alvarado_classificacao: Optional[str] = None
     predicao_knn: Optional[int] = None
@@ -113,6 +139,7 @@ class DiagnosticosListResponse(BaseModel):
 
 
 # ── Errors ──────────────────────────────────────────────────
+
 
 class ErrorResponse(BaseModel):
     detail: str

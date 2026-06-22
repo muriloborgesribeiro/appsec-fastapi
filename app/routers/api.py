@@ -8,9 +8,16 @@ from app.database import get_db
 from app.repositories.historico_repo import HistoryRepository
 from app.config import METRICAS_PATH
 from app.schemas import (
-    DiagnosticoRequest, DiagnosticoResponse, DiagnosticoSummary,
-    DiagnosticosListResponse, Link, ErrorResponse,
-    AlvaradoResult, AlvaradoDetalhe, KnnResult, SvmResult,
+    DiagnosticoRequest,
+    DiagnosticoResponse,
+    DiagnosticoSummary,
+    DiagnosticosListResponse,
+    Link,
+    ErrorResponse,
+    AlvaradoResult,
+    AlvaradoDetalhe,
+    KnnResult,
+    SvmResult,
 )
 from app.services.ml_service import executar_modelos, criar_historico
 from app.auth.dependencies import require_role
@@ -92,6 +99,7 @@ async def criar_diagnostico(
 
     return DiagnosticoResponse(
         id=historico.id,
+        **dados,
         alvarado=_build_alvarado(resultados["alvarado"]),
         knn=_build_knn(resultados["knn"]),
         svm=_build_svm(resultados["svm"]),
@@ -112,31 +120,54 @@ async def listar_diagnosticos(
     _=Depends(require_role("admin", "professional", "viewer")),
     page: int = Query(1, ge=1, description="Número da página"),
     page_size: int = Query(20, ge=1, le=100, description="Itens por página"),
-    data_inicio: Optional[str] = Query(None, description="Filtrar por data início (YYYY-MM-DD)"),
-    data_fim: Optional[str] = Query(None, description="Filtrar por data fim (YYYY-MM-DD)"),
-    classificacao: Optional[str] = Query(None, description="Filtrar por classificação Alvarado"),
-    resultado_knn: Optional[str] = Query(None, description="Filtrar por resultado KNN (0/1)"),
-    resultado_svm: Optional[str] = Query(None, description="Filtrar por resultado SVM (0/1)"),
+    data_inicio: Optional[str] = Query(
+        None, description="Filtrar por data início (YYYY-MM-DD)"
+    ),
+    data_fim: Optional[str] = Query(
+        None, description="Filtrar por data fim (YYYY-MM-DD)"
+    ),
+    classificacao: Optional[str] = Query(
+        None, description="Filtrar por classificação Alvarado"
+    ),
+    resultado_knn: Optional[str] = Query(
+        None, description="Filtrar por resultado KNN (0/1)"
+    ),
+    resultado_svm: Optional[str] = Query(
+        None, description="Filtrar por resultado SVM (0/1)"
+    ),
 ):
     repo = HistoryRepository(db)
     registros, total = repo.list(
-        page=page, page_size=page_size,
-        data_inicio=data_inicio, data_fim=data_fim,
+        page=page,
+        page_size=page_size,
+        data_inicio=data_inicio,
+        data_fim=data_fim,
         classificacao=classificacao,
-        resultado_knn=resultado_knn, resultado_svm=resultado_svm,
+        resultado_knn=resultado_knn,
+        resultado_svm=resultado_svm,
     )
 
     items = [
         DiagnosticoSummary(
             id=r.id,
             created_at=r.created_at.isoformat() if r.created_at else None,
+            dor_migratoria=r.dor_migratoria,
+            anorexia=r.anorexia,
+            nauseas_vomitos=r.nauseas_vomitos,
+            dor_fid=r.dor_fid,
+            descompressao_dolorosa=r.descompressao_dolorosa,
+            temperatura=r.temperatura,
+            leucocitos=r.leucocitos,
+            neutrofilia=r.neutrofilia,
             alvarado_score=r.alvarado_score,
             alvarado_classificacao=r.alvarado_classificacao,
             predicao_knn=r.predicao_knn,
             probabilidade_knn=r.probabilidade_knn,
             predicao_svm=r.predicao_svm,
             probabilidade_svm=r.probabilidade_svm,
-            _links=[Link(href=f"/api/v1/diagnosticos/{r.id}", rel="self", method="GET")],
+            _links=[
+                Link(href=f"/api/v1/diagnosticos/{r.id}", rel="self", method="GET")
+            ],
         )
         for r in registros
     ]
@@ -144,9 +175,21 @@ async def listar_diagnosticos(
     offset = (page - 1) * page_size
     links = [Link(href="/api/v1/diagnosticos", rel="self", method="GET")]
     if page > 1:
-        links.append(Link(href=f"/api/v1/diagnosticos?page={page - 1}&page_size={page_size}", rel="prev", method="GET"))
+        links.append(
+            Link(
+                href=f"/api/v1/diagnosticos?page={page - 1}&page_size={page_size}",
+                rel="prev",
+                method="GET",
+            )
+        )
     if offset + page_size < total:
-        links.append(Link(href=f"/api/v1/diagnosticos?page={page + 1}&page_size={page_size}", rel="next", method="GET"))
+        links.append(
+            Link(
+                href=f"/api/v1/diagnosticos?page={page + 1}&page_size={page_size}",
+                rel="next",
+                method="GET",
+            )
+        )
 
     return DiagnosticosListResponse(
         items=items,
@@ -175,6 +218,14 @@ async def obter_diagnostico(
 
     return DiagnosticoResponse(
         id=historico.id,
+        dor_migratoria=historico.dor_migratoria,
+        anorexia=historico.anorexia,
+        nauseas_vomitos=historico.nauseas_vomitos,
+        dor_fid=historico.dor_fid,
+        descompressao_dolorosa=historico.descompressao_dolorosa,
+        temperatura=historico.temperatura,
+        leucocitos=historico.leucocitos,
+        neutrofilia=historico.neutrofilia,
         alvarado=AlvaradoResult(
             score=historico.alvarado_score or 0,
             classificacao=historico.alvarado_classificacao or "",

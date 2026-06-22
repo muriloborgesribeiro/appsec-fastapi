@@ -77,18 +77,14 @@ class HistoryRepository:
                 DiagnosisHistory.alvarado_classificacao == classificacao
             )
         if resultado_knn:
-            query = query.filter(
-                DiagnosisHistory.predicao_knn == int(resultado_knn)
-            )
+            query = query.filter(DiagnosisHistory.predicao_knn == int(resultado_knn))
         if resultado_svm:
-            query = query.filter(
-                DiagnosisHistory.predicao_svm == int(resultado_svm)
-            )
+            query = query.filter(DiagnosisHistory.predicao_svm == int(resultado_svm))
 
         total = query.count()
         offset = (page - 1) * page_size
         registros = (
-            query.order_by(DiagnosisHistory.created_at.desc())
+            query.order_by(DiagnosisHistory.id.desc())
             .offset(offset)
             .limit(page_size)
             .all()
