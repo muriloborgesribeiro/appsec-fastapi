@@ -66,6 +66,8 @@ GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
 # ── RAG ─────────────────────────────────────────────────────
 DOCS_DIR = os.path.join(BASE_DIR, "specs")
+ML_SRC_DIR = os.path.join(BASE_DIR, "ml")
+AUTH_SRC_DIR = os.path.join(BASE_DIR, "app", "auth")
 RAG_CHUNK_SIZE = 1000
 RAG_CHUNK_OVERLAP = 200
 RAG_TOP_K = 5

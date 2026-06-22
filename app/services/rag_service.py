@@ -5,7 +5,14 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from app.config import DOCS_DIR, RAG_CHUNK_OVERLAP, RAG_CHUNK_SIZE, RAG_TOP_K
+from app.config import (
+    DOCS_DIR,
+    ML_SRC_DIR,
+    AUTH_SRC_DIR,
+    RAG_CHUNK_OVERLAP,
+    RAG_CHUNK_SIZE,
+    RAG_TOP_K,
+)
 
 _EXTRA_DOCS = {
     "README.md": os.path.join(os.path.dirname(DOCS_DIR), "README.md"),
@@ -18,6 +25,14 @@ def _listar_docs() -> list[str]:
         for fname in sorted(os.listdir(DOCS_DIR)):
             if fname.endswith(".md"):
                 caminhos.append(os.path.join(DOCS_DIR, fname))
+    if os.path.isdir(ML_SRC_DIR):
+        for fname in sorted(os.listdir(ML_SRC_DIR)):
+            if fname.endswith(".py") and not fname.startswith("_"):
+                caminhos.append(os.path.join(ML_SRC_DIR, fname))
+    if os.path.isdir(AUTH_SRC_DIR):
+        for fname in sorted(os.listdir(AUTH_SRC_DIR)):
+            if fname.endswith(".py") and not fname.startswith("_"):
+                caminhos.append(os.path.join(AUTH_SRC_DIR, fname))
     for _, path in _EXTRA_DOCS.items():
         if os.path.isfile(path):
             caminhos.append(path)
