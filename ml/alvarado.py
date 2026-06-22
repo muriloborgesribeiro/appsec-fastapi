@@ -18,9 +18,14 @@ from ml.protocolo import ModeloMLProtocol
 
 
 CHAVES_ALVARADO = [
-    "dor_migratoria", "anorexia", "nauseas_vomitos",
-    "dor_fid", "descompressao_dolorosa", "temperatura",
-    "leucocitos", "neutrofilia",
+    "dor_migratoria",
+    "anorexia",
+    "nauseas_vomitos",
+    "dor_fid",
+    "descompressao_dolorosa",
+    "temperatura",
+    "leucocitos",
+    "neutrofilia",
 ]
 
 
@@ -211,6 +216,7 @@ CLASSIFICACOES = {
 #  Interface conforme SPEC-01 6.2
 # -----------------------------------------------------------
 
+
 def calcular_alvarado(dados: dict) -> dict:
     """
     Calcula o Escore de Alvarado para estimativa de risco de apendicite.
@@ -249,28 +255,29 @@ def calcular_alvarado(dados: dict) -> dict:
             # Criterios de limiar: estritamente MAIOR que o threshold
             # SPEC-03 11: temperatura == 37.3 NAO pontua
             # SPEC-03 11: leucocitos == 10000 NAO pontua
-            presente = float(valor) > criterio["threshold"]
+            presente = float(valor) > float(criterio["threshold"])  # type: ignore[arg-type]
 
         if presente:
-            pontos_atribuidos = criterio["pontos"]
+            pontos_atribuidos = criterio["pontos"]  # type: ignore[assignment]
             score += pontos_atribuidos
 
-        detalhamento.append({
-            "criterio": criterio["descricao"],
-            "criterio_completo": criterio["descricao_completa"],
-            "presente": presente,
-            "pontos": pontos_atribuidos,
-            "pontos_max": criterio["pontos"],
-            "categoria": criterio["categoria"],
-            "referencia": criterio["referencia"],
-        })
+        detalhamento.append(
+            {
+                "criterio": criterio["descricao"],
+                "criterio_completo": criterio["descricao_completa"],
+                "presente": presente,
+                "pontos": pontos_atribuidos,
+                "pontos_max": criterio["pontos"],
+                "categoria": criterio["categoria"],
+                "referencia": criterio["referencia"],
+            }
+        )
 
     # Validacao de bounds (SPEC-00 7.3 / SPEC-03 RF-02)
     # Score Alvarado sempre entre 0 e 10
     if not (0 <= score <= 10):
         raise ValueError(
-            f"Score invalido: {score}. Esperado: 0-10. "
-            f"Dados recebidos: {dados}"
+            f"Score invalido: {score}. Esperado: 0-10. Dados recebidos: {dados}"
         )
 
     # Determinar classificacao por faixa
@@ -294,8 +301,8 @@ def _classificar_score(score: int) -> dict:
     Referencia: Ohle R et al. (2011). DOI:10.1186/1741-7015-9-139
     """
     for chave, info in CLASSIFICACOES.items():
-        faixa_min, faixa_max = info["range"]
-        if faixa_min <= score <= faixa_max:
+        faixa_min, faixa_max = int(info["range"][0]), int(info["range"][1])
+        if faixa_min <= int(score) <= faixa_max:
             return {
                 "chave": chave,
                 "label": info["label"],
@@ -307,12 +314,15 @@ def _classificar_score(score: int) -> dict:
 
     # Nunca deveria chegar aqui se o score esta entre 0-10
     # e as faixas cobrem [0-4], [5-6], [7-10]
-    raise AssertionError(f"Score {score} nao se encaixa em nenhuma faixa de classificacao")
+    raise AssertionError(
+        f"Score {score} nao se encaixa em nenhuma faixa de classificacao"
+    )
 
 
 # -----------------------------------------------------------
 #  FUNCAO DE TESTE (SPEC-03 RF-06)
 # -----------------------------------------------------------
+
 
 def testar_alvarado():
     """
@@ -398,7 +408,9 @@ def testar_alvarado():
         "neutrofilia": False,
     }
     r_leuco = calcular_alvarado(caso_limite_leuco)
-    assert r_leuco["score"] == 0, f"Leuco 10000 nao deve pontuar. Score={r_leuco['score']}"
+    assert r_leuco["score"] == 0, (
+        f"Leuco 10000 nao deve pontuar. Score={r_leuco['score']}"
+    )
     print(f"  [OK] Limite leuco=10000: score={r_leuco['score']} (nao pontua)")
 
     # Caso 6: Score 7 (alto) - fronteira

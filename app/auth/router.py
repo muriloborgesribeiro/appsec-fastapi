@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.database import get_db
-from app.auth.models import User
-from app.auth.schemas import UserCreate, UserResponse, LoginRequest, Token
-from app.auth.utils import hash_password, verify_password, create_access_token
 from app.auth.dependencies import get_current_user, require_role
+from app.auth.models import User
+from app.auth.schemas import LoginRequest, Token, UserCreate, UserResponse
+from app.auth.utils import create_access_token, hash_password, verify_password
+from app.database import get_db
 from app.schemas import ErrorResponse
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -28,7 +28,8 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 async def register(payload: UserCreate, db: Session = Depends(get_db)):
     """Registra um novo usuário com perfil **professional**.
 
-    O username e email devem ser únicos. A senha é armazenada de forma segura (hash bcrypt).
+    O username e email devem ser unicos. A senha e armazenada de forma
+    segura (hash bcrypt).
     """
     if db.query(User).filter(User.username == payload.username).first():
         raise HTTPException(status_code=409, detail="Username ja existe")

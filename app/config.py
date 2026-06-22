@@ -44,7 +44,9 @@ PREPROC_VAL_FRAC = 0.50
 PREPROC_RANDOM_STATE = 42
 
 # ── CORS ──────────────────────────────────────────────────
-CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:8082,http://127.0.0.1:8082").split(",")
+CORS_ORIGINS = os.getenv(
+    "CORS_ORIGINS", "http://localhost:8082,http://127.0.0.1:8082"
+).split(",")
 CORS_ALLOW_CREDENTIALS = True
 CORS_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 CORS_HEADERS = ["Content-Type", "Authorization", "X-API-Key"]
@@ -55,4 +57,19 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@appsec.local")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin12")
+
+# ── Groq / LLM ─────────────────────────────────────────────
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+
+# ── RAG ─────────────────────────────────────────────────────
+DOCS_DIR = os.path.join(BASE_DIR, "specs")
+ML_SRC_DIR = os.path.join(BASE_DIR, "ml")
+AUTH_SRC_DIR = os.path.join(BASE_DIR, "app", "auth")
+RAG_CHUNK_SIZE = 1000
+RAG_CHUNK_OVERLAP = 200
+RAG_TOP_K = 5
+RAG_TEMPERATURE = 0.2
+RAG_SIMILARIDADE_MINIMA = 0.03

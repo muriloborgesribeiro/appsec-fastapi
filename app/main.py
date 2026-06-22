@@ -1,17 +1,18 @@
 import os
 import sys
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import (
     BASE_DIR,
-    STATIC_DIR,
-    CORS_ORIGINS,
     CORS_ALLOW_CREDENTIALS,
-    CORS_METHODS,
     CORS_HEADERS,
+    CORS_METHODS,
+    CORS_ORIGINS,
+    STATIC_DIR,
 )
 
 sys.path.insert(0, BASE_DIR)
@@ -19,10 +20,10 @@ sys.path.insert(0, BASE_DIR)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    from app.database import SessionLocal, Base, engine
     from app.auth.models import User
     from app.auth.utils import hash_password
-    from app.config import ADMIN_USERNAME, ADMIN_EMAIL, ADMIN_PASSWORD
+    from app.config import ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_USERNAME
+    from app.database import Base, SessionLocal, engine
 
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
@@ -40,21 +41,34 @@ async def lifespan(app: FastAPI):
             db.commit()
     finally:
         db.close()
+    from app.services.rag_service import get_document_store
+
+    get_document_store().carregar()
     yield
 
 
 tags_metadata = [
     {
         "name": "auth",
-        "description": "Autenticação e gerenciamento de usuários. Registro, login e consulta de perfil.",
+        "description": "Autenticação e gerenciamento de usuários. "
+        "Registro, login e consulta de perfil.",
     },
     {
         "name": "diagnosticos",
-        "description": "Diagnósticos de apendicite utilizando Escala de Alvarado, KNN e SVM. Operações de criação, listagem, consulta e remoção.",
+        "description": "Diagnósticos de apendicite utilizando "
+        "Escala de Alvarado, KNN e SVM. "
+        "Operações de criação, listagem, consulta e remoção.",
     },
     {
         "name": "metricas",
-        "description": "Métricas de desempenho dos modelos de Machine Learning (Acurácia, Precisão, Recall, F1-Score, matriz de confusão).",
+        "description": "Métricas de desempenho dos modelos de Machine Learning "
+        "(Acurácia, Precisão, Recall, F1-Score, matriz de confusão).",
+    },
+    {
+        "name": "duvidas",
+        "description": "Tira duvidas sobre o projeto usando RAG + Groq. "
+        "Envia uma pergunta em linguagem natural e recebe resposta "
+        "baseada na documentação.",
     },
     {
         "name": "health",
@@ -64,16 +78,20 @@ tags_metadata = [
 
 app = FastAPI(
     title="APPSPEC API — Sistema de Apoio ao Diagnóstico de Apendicite",
-    description="Backend API para o Sistema de Apoio ao Diagnóstico de Apendicite — UFG.\n\n"
-    "Combina o escore clínico **Alvarado** com dois modelos de **Machine Learning** "
-    "(KNN e SVM) treinados no dataset *Regensburg Pediatric Appendicitis* (UCI).\n\n"
+    description="Backend API para o Sistema de Apoio ao "
+    "Diagnóstico de Apendicite — UFG.\n\n"
+    "Combina o escore clínico **Alvarado** com dois modelos de "
+    "**Machine Learning** (KNN e SVM) treinados no dataset "
+    "*Regensburg Pediatric Appendicitis* (UCI).\n\n"
     "## Autenticação\n\n"
     "A API utiliza **JWT Bearer Token**. Para acessar endpoints protegidos:\n"
     "1. Faça login em `POST /auth/login` com usuário e senha\n"
     "2. Copie o `access_token` retornado\n"
-    "3. Clique no botão **Authorize** (canto superior direito) e insira o token no formato `Bearer <token>`\n\n"
+    "3. Clique no botão **Authorize** (canto superior direito) e "
+    "insira o token no formato `Bearer <token>`\n\n"
     "## Perfis de Acesso\n\n"
-    "- **admin**: Acesso total (criar, listar, deletar diagnósticos e gerenciar usuários)\n"
+    "- **admin**: Acesso total (criar, listar, deletar "
+    "diagnósticos e gerenciar usuários)\n"
     "- **professional**: Pode criar e listar diagnósticos\n"
     "- **viewer**: Acesso somente leitura (listar diagnósticos e métricas)\n\n"
     "> Projeto didático para a disciplina **Agentes Inteligentes** — UFG.",
@@ -122,7 +140,7 @@ def custom_openapi():
     return app.openapi_schema
 
 
-app.openapi = custom_openapi
+app.openapi = custom_openapi  # type: ignore[method-assign]
 
 
 # ── CORS ────────────────────────────────────────────────────
@@ -144,7 +162,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/; "
+            "style-src 'self' 'unsafe-inline' "
+            "https://cdn.jsdelivr.net "
+            "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/; "
             "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
             "img-src 'self' data:; "
             "font-src 'self' https://cdn.jsdelivr.net;"
@@ -167,11 +187,13 @@ if os.path.exists(STATIC_DIR):
 
 
 # ── Routers ─────────────────────────────────────────────────
-from app.routers import api
 from app.auth import router as auth_router
+from app.routers import api
+from app.routers import duvidas as duvidas_router
 
 app.include_router(api.router)
 app.include_router(api.metricas_router)
+app.include_router(duvidas_router.router)
 app.include_router(auth_router.router)
 
 

@@ -1,26 +1,26 @@
-import os
 import json
+import os
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import Optional
 
+from app.auth.dependencies import require_role
+from app.config import METRICAS_PATH
 from app.database import get_db
 from app.repositories.historico_repo import HistoryRepository
-from app.config import METRICAS_PATH
 from app.schemas import (
+    AlvaradoDetalhe,
+    AlvaradoResult,
     DiagnosticoRequest,
     DiagnosticoResponse,
-    DiagnosticoSummary,
     DiagnosticosListResponse,
-    Link,
+    DiagnosticoSummary,
     ErrorResponse,
-    AlvaradoResult,
-    AlvaradoDetalhe,
     KnnResult,
+    Link,
     SvmResult,
 )
-from app.services.ml_service import executar_modelos, criar_historico
-from app.auth.dependencies import require_role
+from app.services.ml_service import criar_historico, executar_modelos
 
 router = APIRouter(prefix="/api/v1", tags=["diagnosticos"])
 
@@ -40,7 +40,7 @@ def _build_alvarado(alv: dict) -> AlvaradoResult:
 
 def _build_knn(knn: dict) -> KnnResult:
     if "erro" in knn:
-        return KnnResult()
+        return KnnResult()  # type: ignore[call-arg]
     return KnnResult(
         classe_predita=knn.get("classe_predita"),
         label_predita=knn.get("label_predita"),
@@ -60,7 +60,7 @@ def _build_knn(knn: dict) -> KnnResult:
 
 def _build_svm(svm: dict) -> SvmResult:
     if "erro" in svm:
-        return SvmResult()
+        return SvmResult()  # type: ignore[call-arg]
     return SvmResult(
         classe_predita=svm.get("classe_predita"),
         label_predita=svm.get("label_predita"),
@@ -113,8 +113,8 @@ async def criar_diagnostico(
     resultados = executar_modelos(dados)
     historico = criar_historico(db, dados, resultados)
 
-    return DiagnosticoResponse(
-        id=historico.id,
+    return DiagnosticoResponse(  # type: ignore[arg-type]
+        id=historico.id,  # type: ignore[arg-type]
         **dados,
         alvarado=_build_alvarado(resultados["alvarado"]),
         knn=_build_knn(resultados["knn"]),
@@ -139,19 +139,19 @@ async def listar_diagnosticos(
     _=Depends(require_role("admin", "professional", "viewer")),
     page: int = Query(1, ge=1, description="Número da página (começa em 1)"),
     page_size: int = Query(20, ge=1, le=100, description="Itens por página (máx. 100)"),
-    data_inicio: Optional[str] = Query(
+    data_inicio: str | None = Query(
         None, description="Filtrar por data início (formato: YYYY-MM-DD)"
     ),
-    data_fim: Optional[str] = Query(
+    data_fim: str | None = Query(
         None, description="Filtrar por data fim (formato: YYYY-MM-DD)"
     ),
-    classificacao: Optional[str] = Query(
+    classificacao: str | None = Query(
         None, description="Filtrar por classificação Alvarado (ex: Alta Probabilidade)"
     ),
-    resultado_knn: Optional[str] = Query(
+    resultado_knn: str | None = Query(
         None, description="Filtrar por resultado KNN (0 = negativo, 1 = positivo)"
     ),
-    resultado_svm: Optional[str] = Query(
+    resultado_svm: str | None = Query(
         None, description="Filtrar por resultado SVM (0 = negativo, 1 = positivo)"
     ),
 ):
@@ -250,31 +250,31 @@ async def obter_diagnostico(
     repo = HistoryRepository(db)
     historico = repo.find_by_id_or_404(diagnostico_id)
 
-    return DiagnosticoResponse(
-        id=historico.id,
-        dor_migratoria=historico.dor_migratoria,
-        anorexia=historico.anorexia,
-        nauseas_vomitos=historico.nauseas_vomitos,
-        dor_fid=historico.dor_fid,
-        descompressao_dolorosa=historico.descompressao_dolorosa,
-        temperatura=historico.temperatura,
-        leucocitos=historico.leucocitos,
-        neutrofilia=historico.neutrofilia,
+    return DiagnosticoResponse(  # type: ignore[arg-type]
+        id=historico.id,  # type: ignore[arg-type]
+        dor_migratoria=historico.dor_migratoria,  # type: ignore[arg-type]
+        anorexia=historico.anorexia,  # type: ignore[arg-type]
+        nauseas_vomitos=historico.nauseas_vomitos,  # type: ignore[arg-type]
+        dor_fid=historico.dor_fid,  # type: ignore[arg-type]
+        descompressao_dolorosa=historico.descompressao_dolorosa,  # type: ignore[arg-type]
+        temperatura=historico.temperatura,  # type: ignore[arg-type]
+        leucocitos=historico.leucocitos,  # type: ignore[arg-type]
+        neutrofilia=historico.neutrofilia,  # type: ignore[arg-type]
         alvarado=AlvaradoResult(
-            score=historico.alvarado_score or 0,
-            classificacao=historico.alvarado_classificacao or "",
+            score=historico.alvarado_score or 0,  # type: ignore[arg-type]
+            classificacao=historico.alvarado_classificacao or "",  # type: ignore[arg-type]
             label="",
             cor="",
         ),
-        knn=KnnResult(
-            classe_predita=historico.predicao_knn,
-            probabilidade_apendicite=historico.probabilidade_knn,
-            confianca=historico.confianca_knn,
+        knn=KnnResult(  # type: ignore[call-arg]
+            classe_predita=historico.predicao_knn,  # type: ignore[arg-type]
+            probabilidade_apendicite=historico.probabilidade_knn,  # type: ignore[arg-type]
+            confianca=historico.confianca_knn,  # type: ignore[arg-type]
         ),
-        svm=SvmResult(
-            classe_predita=historico.predicao_svm,
-            probabilidade_apendicite=historico.probabilidade_svm,
-            confianca=historico.confianca_svm,
+        svm=SvmResult(  # type: ignore[call-arg]
+            classe_predita=historico.predicao_svm,  # type: ignore[arg-type]
+            probabilidade_apendicite=historico.probabilidade_svm,  # type: ignore[arg-type]
+            confianca=historico.confianca_svm,  # type: ignore[arg-type]
         ),
         _links=[
             Link(href=f"/api/v1/diagnosticos/{historico.id}", rel="self", method="GET"),
@@ -283,6 +283,7 @@ async def obter_diagnostico(
     )
 
 
+# ── Delete ────────────────────────────────────────────────────
 @router.delete(
     "/diagnosticos/{diagnostico_id}",
     status_code=204,
@@ -328,7 +329,7 @@ async def metricas_json(
     """Retorna as métricas de desempenho dos modelos KNN e SVM.
 
     As métricas incluem acurácia, precisão, recall, F1-score e matriz de confusão.
-    Execute `python setup.py` para gerar/atualizar as métricas.
+    Execute `python pipeline.py` para gerar/atualizar as métricas.
 
     Requer perfil **admin**, **professional** ou **viewer**.
     """
@@ -337,5 +338,5 @@ async def metricas_json(
             status_code=404,
             detail="Métricas não encontradas. Execute setup.py primeiro.",
         )
-    with open(METRICAS_PATH, "r", encoding="utf-8") as f:
+    with open(METRICAS_PATH, encoding="utf-8") as f:
         return json.load(f)

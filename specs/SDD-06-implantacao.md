@@ -74,7 +74,7 @@ seaborn>=0.12
 ### 4.1 Execução Completa
 
 ```bash
-python setup.py setup
+python pipeline.py setup
 ```
 
 Executa 11 etapas automaticamente:
@@ -101,10 +101,10 @@ O pipeline é idempotente: se `data/regensburg_raw.csv` e `ml/modelos/knn_model.
 
 ## 5. Execução do Servidor
 
-### 5.1 Via setup.py
+### 5.1 Via pipeline.py
 
 ```bash
-python setup.py start
+python pipeline.py start
 ```
 
 Inicia o servidor em `http://0.0.0.0:8082` com reload automático.
@@ -206,6 +206,6 @@ Script automatizado que:
 |----------|-------|---------|
 | `ModuleNotFoundError` | Dependência faltando | `pip install -r requirements.txt` |
 | Dataset não baixado | Sem internet | Baixar manualmente de `https://archive.ics.uci.edu/dataset/938` |
-| Modelo não treinado | Setup não executado | `python setup.py setup` |
-| Porta ocupada | :8082 em uso | `python setup.py start --port 8083` |
-| Erro de permissão | Static dir não encontrado | Executar `setup.py` primeiro para gerar PNGs |
+| Modelo não treinado | Setup não executado | `python pipeline.py setup` |
+| Porta ocupada | :8082 em uso | `python pipeline.py start --port 8083` |
+| Erro de permissão | Static dir não encontrado | Executar `pipeline.py` primeiro para gerar PNGs |

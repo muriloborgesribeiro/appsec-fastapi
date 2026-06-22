@@ -6,8 +6,12 @@ from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score
 
 from app.config import (
-    SVM_MODEL_PATH, SVM_CANDIDATOS_KERNEL, SVM_RANDOM_STATE,
-    SVM_CV_FOLDS, SVM_PROBABILITY, LIMIAR_DECISAO_PADRAO,
+    SVM_MODEL_PATH,
+    SVM_CANDIDATOS_KERNEL,
+    SVM_RANDOM_STATE,
+    SVM_CV_FOLDS,
+    SVM_PROBABILITY,
+    LIMIAR_DECISAO_PADRAO,
 )
 from ml.protocolo import ModeloMLProtocol
 from ml._confianca import calcular_confianca
@@ -34,7 +38,9 @@ class SvmMotor:
 
     def executar(self, dados: dict) -> dict:
         if not os.path.exists(self.modelo_path):
-            return {"erro": f"Modelo SVM nao treinado. Execute setup.py. Path: {self.modelo_path}"}
+            return {
+                "erro": f"Modelo SVM nao treinado. Execute setup.py. Path: {self.modelo_path}"
+            }
 
         try:
             dados_modelo = joblib.load(self.modelo_path)
@@ -65,7 +71,9 @@ class SvmMotor:
 
         return {
             "classe_predita": classe_predita,
-            "label_predita": LABELS_CLASSE.get(classe_predita, f"Classe {classe_predita}"),
+            "label_predita": LABELS_CLASSE.get(
+                classe_predita, f"Classe {classe_predita}"
+            ),
             "probabilidade_apendicite": prob_apendicite,
             "probabilidade_percentual": f"{prob_apendicite:.1%}",
             "kernel": dados_modelo.get("kernel", "?"),
@@ -84,7 +92,7 @@ def predizer(dados: dict, modelo_path: str = SVM_MODEL_PATH) -> dict:
     return SvmMotor(modelo_path).executar(dados)
 
 
-def treinar_svm(X: pd.DataFrame, y: pd.Series, kernel: str = None) -> dict:
+def treinar_svm(X: pd.DataFrame, y: pd.Series, kernel: str | None = None) -> dict:
     if kernel is not None:
         candidatos = [{"kernel": kernel, "C": 1.0}]
     else:
@@ -152,7 +160,9 @@ def testar_svm():
     assert "kernel" in dados_modelo, "Chave 'kernel' ausente no joblib"
     assert "features" in dados_modelo, "Chave 'features' ausente no joblib"
     assert "acuracia_teste" in dados_modelo, "Chave 'acuracia_teste' ausente no joblib"
-    print(f"  [OK] Modelo carregado: kernel={dados_modelo['kernel']}, C={dados_modelo['C']}")
+    print(
+        f"  [OK] Modelo carregado: kernel={dados_modelo['kernel']}, C={dados_modelo['C']}"
+    )
     print(f"  [OK] Features: {dados_modelo['features']}")
     print(f"  [OK] Acuracia treino: {dados_modelo['acuracia_treino']:.1%}")
     print(f"  [OK] Acuracia teste: {dados_modelo['acuracia_teste']:.1%}")
@@ -163,14 +173,24 @@ def testar_svm():
     resultado = motor.executar(dados_teste)
 
     assert "erro" not in resultado, f"Predicao falhou: {resultado.get('erro')}"
-    assert resultado["classe_predita"] in [0, 1], f"Classe invalida: {resultado['classe_predita']}"
-    assert 0.0 <= resultado["probabilidade_apendicite"] <= 1.0, "Probabilidade fora de [0,1]"
+    assert resultado["classe_predita"] in [0, 1], (
+        f"Classe invalida: {resultado['classe_predita']}"
+    )
+    assert 0.0 <= resultado["probabilidade_apendicite"] <= 1.0, (
+        "Probabilidade fora de [0,1]"
+    )
     assert resultado["disclaimer"], "Disclaimer ausente"
     assert resultado["referencia_algoritmo"], "Referencia do algoritmo ausente"
-    assert resultado["confianca"] in ["Alta", "Media", "Baixa -- resultado inconclusivo"]
+    assert resultado["confianca"] in [
+        "Alta",
+        "Media",
+        "Baixa -- resultado inconclusivo",
+    ]
 
-    print(f"  [OK] Predicao (dados medios): classe={resultado['classe_predita']}, "
-          f"prob={resultado['probabilidade_percentual']}, confianca={resultado['confianca']}")
+    print(
+        f"  [OK] Predicao (dados medios): classe={resultado['classe_predita']}, "
+        f"prob={resultado['probabilidade_percentual']}, confianca={resultado['confianca']}"
+    )
     print(f"  [OK] Disclaimer presente")
     print(f"  [OK] Referencia DOI presente")
 

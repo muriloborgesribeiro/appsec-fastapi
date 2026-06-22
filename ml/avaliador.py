@@ -13,12 +13,17 @@ import numpy as np
 import os
 
 import matplotlib
-matplotlib.use('Agg')  # Backend sem GUI para gerar PNGs
+
+matplotlib.use("Agg")  # Backend sem GUI para gerar PNGs
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import (
-    confusion_matrix, accuracy_score,
-    roc_curve, auc, precision_recall_curve, average_precision_score,
+    confusion_matrix,
+    accuracy_score,
+    roc_curve,
+    auc,
+    precision_recall_curve,
+    average_precision_score,
 )
 
 
@@ -72,7 +77,13 @@ METRICAS = {
 }
 
 
-def avaliar_modelo(y_real: np.ndarray, y_pred: np.ndarray, output_dir: str = None, nome_modelo: str = "KNN", nome_arquivo: str = "confusion_matrix.png") -> dict:
+def avaliar_modelo(
+    y_real: np.ndarray,
+    y_pred: np.ndarray,
+    output_dir: str | None = None,
+    nome_modelo: str = "KNN",
+    nome_arquivo: str = "confusion_matrix.png",
+) -> dict:
     """
     Avalia o modelo com metricas da disciplina e gera a matriz de confusao.
 
@@ -132,17 +143,19 @@ def avaliar_modelo(y_real: np.ndarray, y_pred: np.ndarray, output_dir: str = Non
     }
     metricas_detalhadas = []
     for chave, info in METRICAS.items():
-        metricas_detalhadas.append({
-            "id": chave,
-            "nome": info["nome"],
-            "formula": info["formula"],
-            "formula_curta": info["formula_curta"],
-            "descricao": info["descricao"],
-            "relevancia_clinica": info["relevancia_clinica"],
-            "referencia": info["referencia"],
-            "valor": valores[chave],
-            "valor_percentual": f"{valores[chave]:.1%}",
-        })
+        metricas_detalhadas.append(
+            {
+                "id": chave,
+                "nome": info["nome"],
+                "formula": info["formula"],
+                "formula_curta": info["formula_curta"],
+                "descricao": info["descricao"],
+                "relevancia_clinica": info["relevancia_clinica"],
+                "referencia": info["referencia"],
+                "valor": valores[chave],
+                "valor_percentual": f"{valores[chave]:.1%}",
+            }
+        )
 
     # Gerar imagem da matriz de confusao
     imagem_path = ""
@@ -150,7 +163,14 @@ def avaliar_modelo(y_real: np.ndarray, y_pred: np.ndarray, output_dir: str = Non
         os.makedirs(output_dir, exist_ok=True)
         imagem_path = os.path.join(output_dir, nome_arquivo)
         try:
-            _gerar_imagem_matriz(cm, imagem_path, acuracia, sensibilidade, especificidade, nome_modelo=nome_modelo)
+            _gerar_imagem_matriz(
+                cm,
+                imagem_path,
+                acuracia,
+                sensibilidade,
+                especificidade,
+                nome_modelo=nome_modelo,
+            )
         except Exception as e:
             print(f"       [AVISO] Erro ao gerar imagem da matriz: {e}")
             imagem_path = ""
@@ -202,16 +222,22 @@ def comparar_alvarado_knn(y_real, y_pred_knn, y_pred_alvarado) -> dict:
     for nome, chave, formula in campos:
         val_alv = metricas_alvarado[chave]
         val_knn = metricas_knn[chave]
-        melhor = "knn" if val_knn > val_alv else ("alvarado" if val_alv > val_knn else "empate")
-        tabela.append({
-            "metrica": nome,
-            "formula": formula,
-            "alvarado_valor": val_alv,
-            "alvarado_percentual": f"{val_alv:.1%}",
-            "knn_valor": val_knn,
-            "knn_percentual": f"{val_knn:.1%}",
-            "melhor": melhor,
-        })
+        melhor = (
+            "knn"
+            if val_knn > val_alv
+            else ("alvarado" if val_alv > val_knn else "empate")
+        )
+        tabela.append(
+            {
+                "metrica": nome,
+                "formula": formula,
+                "alvarado_valor": val_alv,
+                "alvarado_percentual": f"{val_alv:.1%}",
+                "knn_valor": val_knn,
+                "knn_percentual": f"{val_knn:.1%}",
+                "melhor": melhor,
+            }
+        )
 
     return {
         "alvarado": {
@@ -228,9 +254,14 @@ def comparar_alvarado_knn(y_real, y_pred_knn, y_pred_alvarado) -> dict:
     }
 
 
-def _gerar_imagem_matriz(cm, output_path: str, acuracia: float,
-                          sensibilidade: float, especificidade: float,
-                          nome_modelo: str = "KNN") -> None:
+def _gerar_imagem_matriz(
+    cm,
+    output_path: str,
+    acuracia: float,
+    sensibilidade: float,
+    especificidade: float,
+    nome_modelo: str = "KNN",
+) -> None:
     """
     Gera imagem PNG da matriz de confusao com metricas visiveis.
     Tecnologia: matplotlib + seaborn (ensinadas na disciplina)
@@ -243,30 +274,30 @@ def _gerar_imagem_matriz(cm, output_path: str, acuracia: float,
     cores_custom = sns.color_palette(["#d4edda", "#2e7d32", "#f8d7da", "#c62828"])
 
     # Colormap diferente por modelo para facilitar distincao visual
-    cmap_modelo = 'Purples' if nome_modelo == 'SVM' else 'Blues'
+    cmap_modelo = "Purples" if nome_modelo == "SVM" else "Blues"
 
     sns.heatmap(
         cm,
         annot=True,
-        fmt='d',
+        fmt="d",
         cmap=cmap_modelo,
-        xticklabels=['Sem Apendicite (0)', 'Apendicite (1)'],
-        yticklabels=['Sem Apendicite (0)', 'Apendicite (1)'],
+        xticklabels=["Sem Apendicite (0)", "Apendicite (1)"],
+        yticklabels=["Sem Apendicite (0)", "Apendicite (1)"],
         ax=ax,
-        annot_kws={'size': 20, 'weight': 'bold'},
+        annot_kws={"size": 20, "weight": "bold"},
         linewidths=3,
-        linecolor='white',
-        cbar_kws={'label': 'Quantidade'},
+        linecolor="white",
+        cbar_kws={"label": "Quantidade"},
     )
 
-    ax.set_xlabel('Predicao do Modelo', fontsize=13, fontweight='bold', labelpad=10)
-    ax.set_ylabel('Diagnostico Real', fontsize=13, fontweight='bold', labelpad=10)
+    ax.set_xlabel("Predicao do Modelo", fontsize=13, fontweight="bold", labelpad=10)
+    ax.set_ylabel("Diagnostico Real", fontsize=13, fontweight="bold", labelpad=10)
     ax.set_title(
-        f'Matriz de Confusao -- {nome_modelo} (scikit-learn)\n'
-        'Disciplina: Agentes Inteligentes -- UFG',
+        f"Matriz de Confusao -- {nome_modelo} (scikit-learn)\n"
+        "Disciplina: Agentes Inteligentes -- UFG",
         fontsize=13,
-        fontweight='bold',
-        pad=15
+        fontweight="bold",
+        pad=15,
     )
 
     # Adicionar metricas abaixo do grafico (SPEC-00 Convencao 8: formulas visiveis)
@@ -277,18 +308,26 @@ def _gerar_imagem_matriz(cm, output_path: str, acuracia: float,
         f"Sensibilidade = VP/(VP+FN) = {sensibilidade:.1%}  |  "
         f"Especificidade = VN/(VN+FP) = {especificidade:.1%}"
     )
-    fig.text(0.5, 0.01, metricas_texto, ha='center', fontsize=9, style='italic',
-             color='#444444', family='monospace')
+    fig.text(
+        0.5,
+        0.01,
+        metricas_texto,
+        ha="center",
+        fontsize=9,
+        style="italic",
+        color="#444444",
+        family="monospace",
+    )
 
     # Legenda dos quadrantes
     legenda = (
         "VN = Verdadeiro Negativo  |  FP = Falso Positivo  |  "
         "FN = Falso Negativo  |  VP = Verdadeiro Positivo"
     )
-    fig.text(0.5, 0.96, legenda, ha='center', fontsize=8, color='#666666')
+    fig.text(0.5, 0.96, legenda, ha="center", fontsize=8, color="#666666")
 
-    plt.tight_layout(rect=[0, 0.06, 1, 0.95])
-    plt.savefig(output_path, dpi=150, bbox_inches='tight', facecolor='white')
+    plt.tight_layout(rect=(0, 0.06, 1, 0.95))
+    plt.savefig(output_path, dpi=150, bbox_inches="tight", facecolor="white")
     plt.close(fig)
 
 
@@ -343,7 +382,7 @@ Algoritmo: KNN (K-Nearest Neighbors) - Cover and Hart, 1967</text>
 </scheme>
 """
 
-    with open(output_path, 'w', encoding='utf-8') as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(ows_content)
 
 
@@ -352,8 +391,8 @@ Algoritmo: KNN (K-Nearest Neighbors) - Cover and Hart, 1967</text>
 #  Referencia: Fawcett T. (2006). DOI:10.1016/j.patrec.2005.10.010
 # -----------------------------------------------------------
 
-def gerar_curva_roc(y_real, y_prob, output_path: str,
-                    nome_modelo: str = "KNN") -> dict:
+
+def gerar_curva_roc(y_real, y_prob, output_path: str, nome_modelo: str = "KNN") -> dict:
     """
     Gera Curva ROC com AUC e ponto otimo de Youden.
 
@@ -389,46 +428,74 @@ def gerar_curva_roc(y_real, y_prob, output_path: str,
     # Plotar curva
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    cor_modelo = '#1565c0' if nome_modelo == 'KNN' else (
-        '#6a1b9a' if nome_modelo == 'SVM' else '#2e7d32')
-
-    ax.plot(fpr, tpr, color=cor_modelo, linewidth=2.5,
-            label=f'{nome_modelo} (AUC = {roc_auc:.3f})')
-    ax.plot([0, 1], [0, 1], 'k--', alpha=0.4, linewidth=1,
-            label='Aleatorio (AUC = 0.500)')
-    ax.plot(fpr[idx_otimo], tpr[idx_otimo], 'ro', markersize=10, zorder=5,
-            label=f'Limiar otimo = {limiar_otimo:.2f} (Youden\'s J)')
-
-    ax.set_xlabel('Taxa de Falso Positivo (FPR = 1 - Especificidade)',
-                  fontsize=11, fontweight='bold')
-    ax.set_ylabel('Taxa de Verdadeiro Positivo (TPR = Sensibilidade)',
-                  fontsize=11, fontweight='bold')
-    ax.set_title(
-        f'Curva ROC -- {nome_modelo}\n'
-        'Disciplina: Agentes Inteligentes -- UFG',
-        fontsize=12, fontweight='bold'
+    cor_modelo = (
+        "#1565c0"
+        if nome_modelo == "KNN"
+        else ("#6a1b9a" if nome_modelo == "SVM" else "#2e7d32")
     )
-    ax.legend(loc='lower right', fontsize=10)
-    ax.set_xlim([-0.02, 1.02])
-    ax.set_ylim([-0.02, 1.02])
+
+    ax.plot(
+        fpr,
+        tpr,
+        color=cor_modelo,
+        linewidth=2.5,
+        label=f"{nome_modelo} (AUC = {roc_auc:.3f})",
+    )
+    ax.plot(
+        [0, 1], [0, 1], "k--", alpha=0.4, linewidth=1, label="Aleatorio (AUC = 0.500)"
+    )
+    ax.plot(
+        fpr[idx_otimo],
+        tpr[idx_otimo],
+        "ro",
+        markersize=10,
+        zorder=5,
+        label=f"Limiar otimo = {limiar_otimo:.2f} (Youden's J)",
+    )
+
+    ax.set_xlabel(
+        "Taxa de Falso Positivo (FPR = 1 - Especificidade)",
+        fontsize=11,
+        fontweight="bold",
+    )
+    ax.set_ylabel(
+        "Taxa de Verdadeiro Positivo (TPR = Sensibilidade)",
+        fontsize=11,
+        fontweight="bold",
+    )
+    ax.set_title(
+        f"Curva ROC -- {nome_modelo}\nDisciplina: Agentes Inteligentes -- UFG",
+        fontsize=12,
+        fontweight="bold",
+    )
+    ax.legend(loc="lower right", fontsize=10)
+    ax.set_xlim((-0.02, 1.02))
+    ax.set_ylim((-0.02, 1.02))
     ax.grid(True, alpha=0.3)
 
     # Anotacao do ponto otimo
     ax.annotate(
-        f'Sens={tpr[idx_otimo]:.1%}\nEsp={1-fpr[idx_otimo]:.1%}',
+        f"Sens={tpr[idx_otimo]:.1%}\nEsp={1 - fpr[idx_otimo]:.1%}",
         xy=(fpr[idx_otimo], tpr[idx_otimo]),
         xytext=(fpr[idx_otimo] + 0.15, tpr[idx_otimo] - 0.15),
-        fontsize=9, color='red',
-        arrowprops=dict(arrowstyle='->', color='red', lw=1.5),
+        fontsize=9,
+        color="red",
+        arrowprops=dict(arrowstyle="->", color="red", lw=1.5),
     )
 
-    fig.text(0.5, 0.01,
-             f'Referencia: Fawcett T. (2006). DOI:10.1016/j.patrec.2005.10.010',
-             ha='center', fontsize=8, color='#888888', style='italic')
+    fig.text(
+        0.5,
+        0.01,
+        f"Referencia: Fawcett T. (2006). DOI:10.1016/j.patrec.2005.10.010",
+        ha="center",
+        fontsize=8,
+        color="#888888",
+        style="italic",
+    )
 
-    plt.tight_layout(rect=[0, 0.04, 1, 1])
+    plt.tight_layout(rect=(0, 0.04, 1, 1))
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    plt.savefig(output_path, dpi=150, bbox_inches='tight', facecolor='white')
+    plt.savefig(output_path, dpi=150, bbox_inches="tight", facecolor="white")
     plt.close(fig)
 
     return {
@@ -440,8 +507,7 @@ def gerar_curva_roc(y_real, y_prob, output_path: str,
     }
 
 
-def gerar_curva_pr(y_real, y_prob, output_path: str,
-                   nome_modelo: str = "KNN") -> dict:
+def gerar_curva_pr(y_real, y_prob, output_path: str, nome_modelo: str = "KNN") -> dict:
     """
     Gera Curva Precision-Recall com Average Precision.
 
@@ -470,38 +536,58 @@ def gerar_curva_pr(y_real, y_prob, output_path: str,
     # Plotar curva
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    cor_modelo = '#1565c0' if nome_modelo == 'KNN' else (
-        '#6a1b9a' if nome_modelo == 'SVM' else '#2e7d32')
+    cor_modelo = (
+        "#1565c0"
+        if nome_modelo == "KNN"
+        else ("#6a1b9a" if nome_modelo == "SVM" else "#2e7d32")
+    )
 
-    ax.plot(recall, precision, color=cor_modelo, linewidth=2.5,
-            label=f'{nome_modelo} (AP = {ap:.3f})')
+    ax.plot(
+        recall,
+        precision,
+        color=cor_modelo,
+        linewidth=2.5,
+        label=f"{nome_modelo} (AP = {ap:.3f})",
+    )
 
     # Linha de baseline (prevalencia da classe positiva)
     prevalencia = np.mean(y_real)
-    ax.axhline(y=prevalencia, color='k', linestyle='--', alpha=0.4,
-               label=f'Baseline (prevalencia = {prevalencia:.1%})')
-
-    ax.set_xlabel('Recall (Sensibilidade = VP / (VP + FN))',
-                  fontsize=11, fontweight='bold')
-    ax.set_ylabel('Precision (VPP = VP / (VP + FP))',
-                  fontsize=11, fontweight='bold')
-    ax.set_title(
-        f'Curva Precision-Recall -- {nome_modelo}\n'
-        'Disciplina: Agentes Inteligentes -- UFG',
-        fontsize=12, fontweight='bold'
+    ax.axhline(
+        y=prevalencia,
+        color="k",
+        linestyle="--",
+        alpha=0.4,
+        label=f"Baseline (prevalencia = {prevalencia:.1%})",
     )
-    ax.legend(loc='lower left', fontsize=10)
-    ax.set_xlim([-0.02, 1.02])
-    ax.set_ylim([-0.02, 1.02])
+
+    ax.set_xlabel(
+        "Recall (Sensibilidade = VP / (VP + FN))", fontsize=11, fontweight="bold"
+    )
+    ax.set_ylabel("Precision (VPP = VP / (VP + FP))", fontsize=11, fontweight="bold")
+    ax.set_title(
+        f"Curva Precision-Recall -- {nome_modelo}\n"
+        "Disciplina: Agentes Inteligentes -- UFG",
+        fontsize=12,
+        fontweight="bold",
+    )
+    ax.legend(loc="lower left", fontsize=10)
+    ax.set_xlim((-0.02, 1.02))
+    ax.set_ylim((-0.02, 1.02))
     ax.grid(True, alpha=0.3)
 
-    fig.text(0.5, 0.01,
-             f'Referencia: Fawcett T. (2006). DOI:10.1016/j.patrec.2005.10.010',
-             ha='center', fontsize=8, color='#888888', style='italic')
+    fig.text(
+        0.5,
+        0.01,
+        f"Referencia: Fawcett T. (2006). DOI:10.1016/j.patrec.2005.10.010",
+        ha="center",
+        fontsize=8,
+        color="#888888",
+        style="italic",
+    )
 
-    plt.tight_layout(rect=[0, 0.04, 1, 1])
+    plt.tight_layout(rect=(0, 0.04, 1, 1))
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    plt.savefig(output_path, dpi=150, bbox_inches='tight', facecolor='white')
+    plt.savefig(output_path, dpi=150, bbox_inches="tight", facecolor="white")
     plt.close(fig)
 
     return {
@@ -532,14 +618,15 @@ def gerar_curvas_comparativas(modelos_dados: list, output_dir: str) -> dict:
 
     # ---- Curva ROC Comparativa ----
     fig_roc, ax_roc = plt.subplots(figsize=(9, 7))
-    ax_roc.plot([0, 1], [0, 1], 'k--', alpha=0.4, linewidth=1,
-                label='Aleatorio (AUC = 0.500)')
+    ax_roc.plot(
+        [0, 1], [0, 1], "k--", alpha=0.4, linewidth=1, label="Aleatorio (AUC = 0.500)"
+    )
 
     for m in modelos_dados:
-        nome = m['nome']
-        y_real = np.asarray(m['y_real'])
-        y_prob = np.asarray(m['y_prob'])
-        cor = m.get('cor', '#333333')
+        nome = m["nome"]
+        y_real = np.asarray(m["y_real"])
+        y_prob = np.asarray(m["y_prob"])
+        cor = m.get("cor", "#333333")
 
         fpr, tpr, thresholds = roc_curve(y_real, y_prob)
         roc_auc = auc(fpr, tpr)
@@ -548,41 +635,52 @@ def gerar_curvas_comparativas(modelos_dados: list, output_dir: str) -> dict:
         idx_otimo = youden_j.argmax()
         limiar_otimo = float(thresholds[idx_otimo])
 
-        ax_roc.plot(fpr, tpr, color=cor, linewidth=2.5,
-                    label=f'{nome} (AUC = {roc_auc:.3f})')
-        ax_roc.plot(fpr[idx_otimo], tpr[idx_otimo], 'o', color=cor,
-                    markersize=8, zorder=5)
+        ax_roc.plot(
+            fpr, tpr, color=cor, linewidth=2.5, label=f"{nome} (AUC = {roc_auc:.3f})"
+        )
+        ax_roc.plot(
+            fpr[idx_otimo], tpr[idx_otimo], "o", color=cor, markersize=8, zorder=5
+        )
 
         # Precision-Recall
         ap = average_precision_score(y_real, y_prob)
 
         resultados[nome] = {
-            'auc_roc': float(roc_auc),
-            'average_precision': float(ap),
-            'limiar_otimo': limiar_otimo,
-            'sensibilidade_otima': float(tpr[idx_otimo]),
-            'especificidade_otima': float(1 - fpr[idx_otimo]),
+            "auc_roc": float(roc_auc),
+            "average_precision": float(ap),
+            "limiar_otimo": limiar_otimo,
+            "sensibilidade_otima": float(tpr[idx_otimo]),
+            "especificidade_otima": float(1 - fpr[idx_otimo]),
         }
 
-    ax_roc.set_xlabel('Taxa de Falso Positivo (FPR)', fontsize=12, fontweight='bold')
-    ax_roc.set_ylabel('Taxa de Verdadeiro Positivo (TPR)', fontsize=12, fontweight='bold')
-    ax_roc.set_title(
-        'Curva ROC Comparativa -- Alvarado vs KNN vs SVM\n'
-        'Disciplina: Agentes Inteligentes -- UFG',
-        fontsize=13, fontweight='bold'
+    ax_roc.set_xlabel("Taxa de Falso Positivo (FPR)", fontsize=12, fontweight="bold")
+    ax_roc.set_ylabel(
+        "Taxa de Verdadeiro Positivo (TPR)", fontsize=12, fontweight="bold"
     )
-    ax_roc.legend(loc='lower right', fontsize=10)
-    ax_roc.set_xlim([-0.02, 1.02])
-    ax_roc.set_ylim([-0.02, 1.02])
+    ax_roc.set_title(
+        "Curva ROC Comparativa -- Alvarado vs KNN vs SVM\n"
+        "Disciplina: Agentes Inteligentes -- UFG",
+        fontsize=13,
+        fontweight="bold",
+    )
+    ax_roc.legend(loc="lower right", fontsize=10)
+    ax_roc.set_xlim((-0.02, 1.02))
+    ax_roc.set_ylim((-0.02, 1.02))
     ax_roc.grid(True, alpha=0.3)
 
-    fig_roc.text(0.5, 0.01,
-                 'Referencia: Fawcett T. (2006). DOI:10.1016/j.patrec.2005.10.010',
-                 ha='center', fontsize=8, color='#888888', style='italic')
+    fig_roc.text(
+        0.5,
+        0.01,
+        "Referencia: Fawcett T. (2006). DOI:10.1016/j.patrec.2005.10.010",
+        ha="center",
+        fontsize=8,
+        color="#888888",
+        style="italic",
+    )
 
-    plt.tight_layout(rect=[0, 0.04, 1, 1])
-    roc_path = os.path.join(output_dir, 'roc_comparativa.png')
-    plt.savefig(roc_path, dpi=150, bbox_inches='tight', facecolor='white')
+    plt.tight_layout(rect=(0, 0.04, 1, 1))
+    roc_path = os.path.join(output_dir, "roc_comparativa.png")
+    plt.savefig(roc_path, dpi=150, bbox_inches="tight", facecolor="white")
     plt.close(fig_roc)
 
     # ---- Curva PR Comparativa ----
@@ -590,41 +688,54 @@ def gerar_curvas_comparativas(modelos_dados: list, output_dir: str) -> dict:
 
     # Linha de baseline (prevalencia)
     if modelos_dados:
-        prevalencia = np.mean(np.asarray(modelos_dados[0]['y_real']))
-        ax_pr.axhline(y=prevalencia, color='k', linestyle='--', alpha=0.4,
-                      label=f'Baseline (prevalencia = {prevalencia:.1%})')
+        prevalencia = np.mean(np.asarray(modelos_dados[0]["y_real"]))
+        ax_pr.axhline(
+            y=prevalencia,
+            color="k",
+            linestyle="--",
+            alpha=0.4,
+            label=f"Baseline (prevalencia = {prevalencia:.1%})",
+        )
 
     for m in modelos_dados:
-        nome = m['nome']
-        y_real = np.asarray(m['y_real'])
-        y_prob = np.asarray(m['y_prob'])
-        cor = m.get('cor', '#333333')
+        nome = m["nome"]
+        y_real = np.asarray(m["y_real"])
+        y_prob = np.asarray(m["y_prob"])
+        cor = m.get("cor", "#333333")
 
         precision, recall, _ = precision_recall_curve(y_real, y_prob)
         ap = average_precision_score(y_real, y_prob)
 
-        ax_pr.plot(recall, precision, color=cor, linewidth=2.5,
-                   label=f'{nome} (AP = {ap:.3f})')
+        ax_pr.plot(
+            recall, precision, color=cor, linewidth=2.5, label=f"{nome} (AP = {ap:.3f})"
+        )
 
-    ax_pr.set_xlabel('Recall (Sensibilidade)', fontsize=12, fontweight='bold')
-    ax_pr.set_ylabel('Precision (VPP)', fontsize=12, fontweight='bold')
+    ax_pr.set_xlabel("Recall (Sensibilidade)", fontsize=12, fontweight="bold")
+    ax_pr.set_ylabel("Precision (VPP)", fontsize=12, fontweight="bold")
     ax_pr.set_title(
-        'Curva Precision-Recall Comparativa -- Alvarado vs KNN vs SVM\n'
-        'Disciplina: Agentes Inteligentes -- UFG',
-        fontsize=13, fontweight='bold'
+        "Curva Precision-Recall Comparativa -- Alvarado vs KNN vs SVM\n"
+        "Disciplina: Agentes Inteligentes -- UFG",
+        fontsize=13,
+        fontweight="bold",
     )
-    ax_pr.legend(loc='lower left', fontsize=10)
-    ax_pr.set_xlim([-0.02, 1.02])
-    ax_pr.set_ylim([-0.02, 1.02])
+    ax_pr.legend(loc="lower left", fontsize=10)
+    ax_pr.set_xlim((-0.02, 1.02))
+    ax_pr.set_ylim((-0.02, 1.02))
     ax_pr.grid(True, alpha=0.3)
 
-    fig_pr.text(0.5, 0.01,
-                'Referencia: Fawcett T. (2006). DOI:10.1016/j.patrec.2005.10.010',
-                ha='center', fontsize=8, color='#888888', style='italic')
+    fig_pr.text(
+        0.5,
+        0.01,
+        "Referencia: Fawcett T. (2006). DOI:10.1016/j.patrec.2005.10.010",
+        ha="center",
+        fontsize=8,
+        color="#888888",
+        style="italic",
+    )
 
-    plt.tight_layout(rect=[0, 0.04, 1, 1])
-    pr_path = os.path.join(output_dir, 'pr_comparativa.png')
-    plt.savefig(pr_path, dpi=150, bbox_inches='tight', facecolor='white')
+    plt.tight_layout(rect=(0, 0.04, 1, 1))
+    pr_path = os.path.join(output_dir, "pr_comparativa.png")
+    plt.savefig(pr_path, dpi=150, bbox_inches="tight", facecolor="white")
     plt.close(fig_pr)
 
     return {
@@ -637,6 +748,7 @@ def gerar_curvas_comparativas(modelos_dados: list, output_dir: str) -> dict:
 # -----------------------------------------------------------
 #  FUNCAO DE TESTE (SPEC-05 13)
 # -----------------------------------------------------------
+
 
 def testar_avaliador():
     """
@@ -682,14 +794,20 @@ def testar_avaliador():
     assert abs(r_m["sensibilidade"] - 0.5) < 0.01
     # Especificidade = 3/(3+1) = 0.75
     assert abs(r_m["especificidade"] - 0.75) < 0.01
-    print(f"  [OK] Caso misto: VP={r_m['vp']} FP={r_m['fp']} "
-          f"FN={r_m['fn']} VN={r_m['vn']}")
-    print(f"       Sensibilidade={r_m['sensibilidade']:.1%} "
-          f"Especificidade={r_m['especificidade']:.1%}")
+    print(
+        f"  [OK] Caso misto: VP={r_m['vp']} FP={r_m['fp']} "
+        f"FN={r_m['fn']} VN={r_m['vn']}"
+    )
+    print(
+        f"       Sensibilidade={r_m['sensibilidade']:.1%} "
+        f"Especificidade={r_m['especificidade']:.1%}"
+    )
 
     # Caso 4: Verificar metricas_detalhadas
     assert "metricas_detalhadas" in r, "metricas_detalhadas ausente no output"
-    assert len(r["metricas_detalhadas"]) == 5, f"Esperado 5 metricas, obteve {len(r['metricas_detalhadas'])}"
+    assert len(r["metricas_detalhadas"]) == 5, (
+        f"Esperado 5 metricas, obteve {len(r['metricas_detalhadas'])}"
+    )
     for m in r["metricas_detalhadas"]:
         assert "formula" in m, f"Formula ausente em {m['id']}"
         assert "referencia" in m, f"Referencia ausente em {m['id']}"
@@ -707,10 +825,13 @@ def testar_avaliador():
 
     # Caso 6: Gerar imagem (se output_dir fornecido)
     import tempfile
+
     tmp_dir = tempfile.mkdtemp()
     r_img = avaliar_modelo(y_real, y_pred, output_dir=tmp_dir)
     assert r_img["imagem_matrix"], "Imagem deveria ter sido gerada"
-    assert os.path.exists(r_img["imagem_matrix"]), f"Imagem nao encontrada: {r_img['imagem_matrix']}"
+    assert os.path.exists(r_img["imagem_matrix"]), (
+        f"Imagem nao encontrada: {r_img['imagem_matrix']}"
+    )
     print(f"  [OK] Imagem da matriz gerada: {r_img['imagem_matrix']}")
     # Limpar
     os.remove(r_img["imagem_matrix"])
@@ -727,10 +848,11 @@ def testar_avaliador():
 
     # Caso 8: Gerar Orange .ows
     import tempfile
+
     tmp_ows = os.path.join(tempfile.mkdtemp(), "teste.ows")
     gerar_orange_ows("data/regensburg_processed.csv", tmp_ows)
     assert os.path.exists(tmp_ows), "Arquivo .ows nao gerado"
-    with open(tmp_ows, 'r', encoding='utf-8') as f:
+    with open(tmp_ows, "r", encoding="utf-8") as f:
         conteudo = f.read()
     assert "KNN" in conteudo, "KNN nao encontrado no .ows"
     assert "Confusion Matrix" in conteudo, "Confusion Matrix nao encontrada no .ows"

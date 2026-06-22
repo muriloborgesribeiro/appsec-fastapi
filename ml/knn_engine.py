@@ -6,8 +6,12 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
 
 from app.config import (
-    KNN_MODEL_PATH, K_MINIMO_CLINICO, CANDIDATOS_K,
-    KNN_METRIC, KNN_WEIGHTS, KNN_CV_FOLDS,
+    KNN_MODEL_PATH,
+    K_MINIMO_CLINICO,
+    CANDIDATOS_K,
+    KNN_METRIC,
+    KNN_WEIGHTS,
+    KNN_CV_FOLDS,
     LIMIAR_DECISAO_PADRAO,
 )
 from ml.protocolo import ModeloMLProtocol
@@ -34,7 +38,9 @@ class KnnMotor:
 
     def executar(self, dados: dict) -> dict:
         if not os.path.exists(self.modelo_path):
-            return {"erro": f"Modelo KNN nao treinado. Execute setup.py. Path: {self.modelo_path}"}
+            return {
+                "erro": f"Modelo KNN nao treinado. Execute setup.py. Path: {self.modelo_path}"
+            }
 
         try:
             dados_modelo = joblib.load(self.modelo_path)
@@ -67,7 +73,9 @@ class KnnMotor:
 
         return {
             "classe_predita": classe_predita,
-            "label_predita": LABELS_CLASSE.get(classe_predita, f"Classe {classe_predita}"),
+            "label_predita": LABELS_CLASSE.get(
+                classe_predita, f"Classe {classe_predita}"
+            ),
             "probabilidade_apendicite": prob_apendicite,
             "probabilidade_percentual": f"{prob_apendicite:.1%}",
             "k_vizinhos": modelo.n_neighbors,
@@ -87,10 +95,12 @@ def predizer(dados: dict, modelo_path: str = KNN_MODEL_PATH) -> dict:
     return KnnMotor(modelo_path).executar(dados)
 
 
-def treinar_knn(X: pd.DataFrame, y: pd.Series, k: int = None) -> dict:
+def treinar_knn(X: pd.DataFrame, y: pd.Series, k: int | None = None) -> dict:
     if k is not None:
         if k < K_MINIMO_CLINICO:
-            print(f"       [AVISO] k={k} rejeitado (minimo clinico = {K_MINIMO_CLINICO})")
+            print(
+                f"       [AVISO] k={k} rejeitado (minimo clinico = {K_MINIMO_CLINICO})"
+            )
             k = K_MINIMO_CLINICO
         candidatos_k = [k]
     else:
@@ -105,7 +115,9 @@ def treinar_knn(X: pd.DataFrame, y: pd.Series, k: int = None) -> dict:
 
     for k_teste in candidatos_k:
         modelo_teste = KNeighborsClassifier(
-            n_neighbors=k_teste, metric=KNN_METRIC, weights=KNN_WEIGHTS,
+            n_neighbors=k_teste,
+            metric=KNN_METRIC,
+            weights=KNN_WEIGHTS,
         )
         cv_folds = min(KNN_CV_FOLDS, n_amostras)
         scores = cross_val_score(modelo_teste, X, y, cv=cv_folds, scoring="accuracy")
@@ -121,7 +133,9 @@ def treinar_knn(X: pd.DataFrame, y: pd.Series, k: int = None) -> dict:
             melhor_k = k_teste
 
     modelo_final = KNeighborsClassifier(
-        n_neighbors=melhor_k, metric=KNN_METRIC, weights=KNN_WEIGHTS,
+        n_neighbors=melhor_k,
+        metric=KNN_METRIC,
+        weights=KNN_WEIGHTS,
     )
     modelo_final.fit(X, y)
     acuracia_treino = float(modelo_final.score(X, y))
@@ -156,7 +170,10 @@ def _carregar_scaler(modelo_dir: str):
 
 
 def _montar_array(
-    dados: dict, features_ordem: list, features_opcionais: list, medianas_opcionais: dict
+    dados: dict,
+    features_ordem: list,
+    features_opcionais: list,
+    medianas_opcionais: dict,
 ) -> tuple:
     features_imputadas = []
     valores = []
@@ -169,12 +186,16 @@ def _montar_array(
                     valores.append(medianas_opcionais[f])
                     features_imputadas.append(f)
                 else:
-                    return {"erro": f"Valor invalido para feature obrigatoria '{f}': {dados[f]}"}, []
+                    return {
+                        "erro": f"Valor invalido para feature obrigatoria '{f}': {dados[f]}"
+                    }, []
         elif f in features_opcionais and f in medianas_opcionais:
             valores.append(medianas_opcionais[f])
             features_imputadas.append(f)
         else:
-            return {"erro": f"Feature obrigatoria ausente: '{f}'. Features esperadas: {features_ordem}"}, []
+            return {
+                "erro": f"Feature obrigatoria ausente: '{f}'. Features esperadas: {features_ordem}"
+            }, []
 
     return pd.DataFrame([valores], columns=features_ordem), features_imputadas
 
@@ -206,36 +227,56 @@ def testar_knn():
     resultado = motor.executar(dados_teste)
 
     assert "erro" not in resultado, f"Predicao falhou: {resultado.get('erro')}"
-    assert resultado["classe_predita"] in [0, 1], f"Classe invalida: {resultado['classe_predita']}"
-    assert 0.0 <= resultado["probabilidade_apendicite"] <= 1.0, "Probabilidade fora de [0,1]"
+    assert resultado["classe_predita"] in [0, 1], (
+        f"Classe invalida: {resultado['classe_predita']}"
+    )
+    assert 0.0 <= resultado["probabilidade_apendicite"] <= 1.0, (
+        "Probabilidade fora de [0,1]"
+    )
     assert resultado["k_vizinhos"] == dados_modelo["k"], "k inconsistente"
-    assert len(resultado["distancias"]) == dados_modelo["k"], "Numero de distancias != k"
+    assert len(resultado["distancias"]) == dados_modelo["k"], (
+        "Numero de distancias != k"
+    )
     assert resultado["disclaimer"], "Disclaimer ausente"
     assert resultado["referencia_algoritmo"], "Referencia do algoritmo ausente"
-    assert resultado["confianca"] in ["Alta", "Media", "Baixa -- resultado inconclusivo"]
+    assert resultado["confianca"] in [
+        "Alta",
+        "Media",
+        "Baixa -- resultado inconclusivo",
+    ]
 
-    print(f"  [OK] Predicao (dados medios): classe={resultado['classe_predita']}, "
-          f"prob={resultado['probabilidade_percentual']}, confianca={resultado['confianca']}")
-    print(f"  [OK] Distancia media vizinhos: {resultado['distancia_media_vizinhos']:.4f}")
+    print(
+        f"  [OK] Predicao (dados medios): classe={resultado['classe_predita']}, "
+        f"prob={resultado['probabilidade_percentual']}, confianca={resultado['confianca']}"
+    )
+    print(
+        f"  [OK] Distancia media vizinhos: {resultado['distancia_media_vizinhos']:.4f}"
+    )
     print(f"  [OK] Disclaimer presente")
     print(f"  [OK] Referencia DOI presente")
 
     dados_zero = {f: 0.0 for f in features}
     r_zero = motor.executar(dados_zero)
     assert "erro" not in r_zero, f"Predicao falhou: {r_zero.get('erro')}"
-    print(f"  [OK] Predicao (zeros): classe={r_zero['classe_predita']}, "
-          f"prob={r_zero['probabilidade_percentual']}")
+    print(
+        f"  [OK] Predicao (zeros): classe={r_zero['classe_predita']}, "
+        f"prob={r_zero['probabilidade_percentual']}"
+    )
 
     dados_um = {f: 1.0 for f in features}
     r_um = motor.executar(dados_um)
     assert "erro" not in r_um, f"Predicao falhou: {r_um.get('erro')}"
-    print(f"  [OK] Predicao (uns): classe={r_um['classe_predita']}, "
-          f"prob={r_um['probabilidade_percentual']}")
+    print(
+        f"  [OK] Predicao (uns): classe={r_um['classe_predita']}, "
+        f"prob={r_um['probabilidade_percentual']}"
+    )
 
     import sys
+
     if BASE_DIR not in sys.path:
         sys.path.insert(0, BASE_DIR)
     from ml.preprocessamento import FEATURES_OPCIONAIS_RUNTIME
+
     features_opcionais_modelo = dados_modelo.get("features_opcionais", [])
     features_obrig_modelo = [f for f in features if f not in FEATURES_OPCIONAIS_RUNTIME]
     if features_obrig_modelo:
@@ -251,13 +292,22 @@ def testar_knn():
     assert "erro" in r_sem, "Deveria retornar erro com modelo inexistente"
     print(f"  [OK] Modelo inexistente detectado")
 
-    features_opcionais_neste_modelo = [f for f in features if f in FEATURES_OPCIONAIS_RUNTIME]
+    features_opcionais_neste_modelo = [
+        f for f in features if f in FEATURES_OPCIONAIS_RUNTIME
+    ]
     if features_opcionais_neste_modelo:
-        dados_sem_opcionais = {f: 0.5 for f in features if f not in FEATURES_OPCIONAIS_RUNTIME}
+        dados_sem_opcionais = {
+            f: 0.5 for f in features if f not in FEATURES_OPCIONAIS_RUNTIME
+        }
         r_opt = motor.executar(dados_sem_opcionais)
-        assert "erro" not in r_opt, f"NAO deveria dar erro com features opcionais ausentes: {r_opt.get('erro')}"
-        assert len(r_opt["features_imputadas"]) == len(features_opcionais_neste_modelo), \
+        assert "erro" not in r_opt, (
+            f"NAO deveria dar erro com features opcionais ausentes: {r_opt.get('erro')}"
+        )
+        assert len(r_opt["features_imputadas"]) == len(
+            features_opcionais_neste_modelo
+        ), (
             f"Deveria imputar {len(features_opcionais_neste_modelo)}, imputou {len(r_opt['features_imputadas'])}"
+        )
         print(f"  [OK] Features opcionais omitidas: imputacao automatica por mediana")
         print(f"       Features imputadas: {r_opt['features_imputadas']}")
     else:
