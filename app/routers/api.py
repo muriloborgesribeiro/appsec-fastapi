@@ -40,7 +40,7 @@ def _build_alvarado(alv: dict) -> AlvaradoResult:
 
 def _build_knn(knn: dict) -> KnnResult:
     if "erro" in knn:
-        return KnnResult()
+        return KnnResult()  # type: ignore[call-arg]
     return KnnResult(
         classe_predita=knn.get("classe_predita"),
         label_predita=knn.get("label_predita"),
@@ -60,7 +60,7 @@ def _build_knn(knn: dict) -> KnnResult:
 
 def _build_svm(svm: dict) -> SvmResult:
     if "erro" in svm:
-        return SvmResult()
+        return SvmResult()  # type: ignore[call-arg]
     return SvmResult(
         classe_predita=svm.get("classe_predita"),
         label_predita=svm.get("label_predita"),
@@ -114,7 +114,7 @@ async def criar_diagnostico(
     historico = criar_historico(db, dados, resultados)
 
     return DiagnosticoResponse(
-        id=historico.id,
+        id=historico.id,  # type: ignore[arg-type]
         **dados,
         alvarado=_build_alvarado(resultados["alvarado"]),
         knn=_build_knn(resultados["knn"]),
@@ -251,30 +251,30 @@ async def obter_diagnostico(
     historico = repo.find_by_id_or_404(diagnostico_id)
 
     return DiagnosticoResponse(
-        id=historico.id,
-        dor_migratoria=historico.dor_migratoria,
-        anorexia=historico.anorexia,
-        nauseas_vomitos=historico.nauseas_vomitos,
-        dor_fid=historico.dor_fid,
-        descompressao_dolorosa=historico.descompressao_dolorosa,
-        temperatura=historico.temperatura,
-        leucocitos=historico.leucocitos,
-        neutrofilia=historico.neutrofilia,
+        id=historico.id,  # type: ignore[arg-type]
+        dor_migratoria=historico.dor_migratoria,  # type: ignore[arg-type]
+        anorexia=historico.anorexia,  # type: ignore[arg-type]
+        nauseas_vomitos=historico.nauseas_vomitos,  # type: ignore[arg-type]
+        dor_fid=historico.dor_fid,  # type: ignore[arg-type]
+        descompressao_dolorosa=historico.descompressao_dolorosa,  # type: ignore[arg-type]
+        temperatura=historico.temperatura,  # type: ignore[arg-type]
+        leucocitos=historico.leucocitos,  # type: ignore[arg-type]
+        neutrofilia=historico.neutrofilia,  # type: ignore[arg-type]
         alvarado=AlvaradoResult(
-            score=historico.alvarado_score or 0,
-            classificacao=historico.alvarado_classificacao or "",
+            score=historico.alvarado_score or 0,  # type: ignore[arg-type]
+            classificacao=historico.alvarado_classificacao or "",  # type: ignore[arg-type]
             label="",
             cor="",
         ),
-        knn=KnnResult(
-            classe_predita=historico.predicao_knn,
-            probabilidade_apendicite=historico.probabilidade_knn,
-            confianca=historico.confianca_knn,
+        knn=KnnResult(  # type: ignore[call-arg]
+            classe_predita=historico.predicao_knn,  # type: ignore[arg-type]
+            probabilidade_apendicite=historico.probabilidade_knn,  # type: ignore[arg-type]
+            confianca=historico.confianca_knn,  # type: ignore[arg-type]
         ),
-        svm=SvmResult(
-            classe_predita=historico.predicao_svm,
-            probabilidade_apendicite=historico.probabilidade_svm,
-            confianca=historico.confianca_svm,
+        svm=SvmResult(  # type: ignore[call-arg]
+            classe_predita=historico.predicao_svm,  # type: ignore[arg-type]
+            probabilidade_apendicite=historico.probabilidade_svm,  # type: ignore[arg-type]
+            confianca=historico.confianca_svm,  # type: ignore[arg-type]
         ),
         _links=[
             Link(href=f"/api/v1/diagnosticos/{historico.id}", rel="self", method="GET"),
@@ -283,6 +283,7 @@ async def obter_diagnostico(
     )
 
 
+# ── Delete ────────────────────────────────────────────────────
 @router.delete(
     "/diagnosticos/{diagnostico_id}",
     status_code=204,
