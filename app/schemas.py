@@ -1,6 +1,4 @@
 from pydantic import BaseModel, Field
-from typing import Optional
-
 
 # ── Request ─────────────────────────────────────────────────
 
@@ -78,9 +76,9 @@ class AlvaradoResult(BaseModel):
     classificacao: str
     label: str
     cor: str
-    interpretacao: Optional[str] = None
-    conduta: Optional[str] = None
-    disclaimer: Optional[str] = None
+    interpretacao: str | None = None
+    conduta: str | None = None
+    disclaimer: str | None = None
     detalhamento: list[AlvaradoDetalhe] = []
 
     model_config = {
@@ -115,34 +113,34 @@ class AlvaradoResult(BaseModel):
 class KnnResult(BaseModel):
     """Resultado da predição do modelo KNN (K-Nearest Neighbors)."""
 
-    classe_predita: Optional[int] = Field(
+    classe_predita: int | None = Field(
         None, description="Classe predita (0 = negativo, 1 = positivo)"
     )
-    label_predita: Optional[str] = Field(None, description="Rótulo da classe predita")
-    probabilidade_apendicite: Optional[float] = Field(
+    label_predita: str | None = Field(None, description="Rótulo da classe predita")
+    probabilidade_apendicite: float | None = Field(
         None, description="Probabilidade de apendicite (0 a 1)"
     )
-    probabilidade_percentual: Optional[str] = Field(
+    probabilidade_percentual: str | None = Field(
         None, description="Probabilidade formatada em percentual"
     )
-    k_vizinhos: Optional[int] = Field(
+    k_vizinhos: int | None = Field(
         None, description="Número de vizinhos considerados (k)"
     )
-    acuracia_modelo: Optional[float] = Field(
+    acuracia_modelo: float | None = Field(
         None, description="Acurácia do modelo nos dados de validação"
     )
-    distancia_media_vizinhos: Optional[float] = Field(
+    distancia_media_vizinhos: float | None = Field(
         None, description="Distância média aos k vizinhos mais próximos"
     )
-    confianca: Optional[str] = Field(None, description="Nível de confiança da predição")
-    limiar_decisao: Optional[float] = Field(
+    confianca: str | None = Field(None, description="Nível de confiança da predição")
+    limiar_decisao: float | None = Field(
         None, description="Limiar de decisão utilizado"
     )
-    algoritmo: Optional[str] = Field(None, description="Nome do algoritmo")
-    referencia_algoritmo: Optional[str] = Field(
+    algoritmo: str | None = Field(None, description="Nome do algoritmo")
+    referencia_algoritmo: str | None = Field(
         None, description="Referência bibliográfica do algoritmo"
     )
-    disclaimer: Optional[str] = None
+    disclaimer: str | None = None
     features_imputadas: list[str] = []
 
     model_config = {
@@ -171,32 +169,32 @@ class KnnResult(BaseModel):
 class SvmResult(BaseModel):
     """Resultado da predição do modelo SVM (Support Vector Machine)."""
 
-    classe_predita: Optional[int] = Field(
+    classe_predita: int | None = Field(
         None, description="Classe predita (0 = negativo, 1 = positivo)"
     )
-    label_predita: Optional[str] = Field(None, description="Rótulo da classe predita")
-    probabilidade_apendicite: Optional[float] = Field(
+    label_predita: str | None = Field(None, description="Rótulo da classe predita")
+    probabilidade_apendicite: float | None = Field(
         None, description="Probabilidade de apendicite (0 a 1)"
     )
-    probabilidade_percentual: Optional[str] = Field(
+    probabilidade_percentual: str | None = Field(
         None, description="Probabilidade formatada em percentual"
     )
-    kernel: Optional[str] = Field(
+    kernel: str | None = Field(
         None, description="Função kernel utilizada (rbf, linear, polynomial)"
     )
-    C: Optional[float] = Field(None, description="Parâmetro de regularização do SVM")
-    acuracia_modelo: Optional[float] = Field(
+    C: float | None = Field(None, description="Parâmetro de regularização do SVM")
+    acuracia_modelo: float | None = Field(
         None, description="Acurácia do modelo nos dados de validação"
     )
-    confianca: Optional[str] = Field(None, description="Nível de confiança da predição")
-    limiar_decisao: Optional[float] = Field(
+    confianca: str | None = Field(None, description="Nível de confiança da predição")
+    limiar_decisao: float | None = Field(
         None, description="Limiar de decisão utilizado"
     )
-    algoritmo: Optional[str] = Field(None, description="Nome do algoritmo")
-    referencia_algoritmo: Optional[str] = Field(
+    algoritmo: str | None = Field(None, description="Nome do algoritmo")
+    referencia_algoritmo: str | None = Field(
         None, description="Referência bibliográfica do algoritmo"
     )
-    disclaimer: Optional[str] = None
+    disclaimer: str | None = None
     features_imputadas: list[str] = []
 
     model_config = {
@@ -244,21 +242,21 @@ class DiagnosticoSummary(BaseModel):
     """Resumo de um diagnóstico para exibição em listas."""
 
     id: int
-    created_at: Optional[str] = None
-    dor_migratoria: Optional[bool] = None
-    anorexia: Optional[bool] = None
-    nauseas_vomitos: Optional[bool] = None
-    dor_fid: Optional[bool] = None
-    descompressao_dolorosa: Optional[bool] = None
-    temperatura: Optional[float] = None
-    leucocitos: Optional[float] = None
-    neutrofilia: Optional[bool] = None
-    alvarado_score: Optional[int] = None
-    alvarado_classificacao: Optional[str] = None
-    predicao_knn: Optional[int] = None
-    probabilidade_knn: Optional[float] = None
-    predicao_svm: Optional[int] = None
-    probabilidade_svm: Optional[float] = None
+    created_at: str | None = None
+    dor_migratoria: bool | None = None
+    anorexia: bool | None = None
+    nauseas_vomitos: bool | None = None
+    dor_fid: bool | None = None
+    descompressao_dolorosa: bool | None = None
+    temperatura: float | None = None
+    leucocitos: float | None = None
+    neutrofilia: bool | None = None
+    alvarado_score: int | None = None
+    alvarado_classificacao: str | None = None
+    predicao_knn: int | None = None
+    probabilidade_knn: float | None = None
+    predicao_svm: int | None = None
+    probabilidade_svm: float | None = None
     _links: list[Link] = []
 
 
@@ -270,6 +268,35 @@ class DiagnosticosListResponse(BaseModel):
     page: int
     page_size: int
     _links: list[Link] = []
+
+
+# ── Duvidas (RAG) ────────────────────────────────────────────
+
+
+class DuvidaRequest(BaseModel):
+    """Pergunta do usuario sobre o projeto."""
+
+    pergunta: str = Field(
+        ...,
+        min_length=10,
+        max_length=1000,
+        description="Pergunta sobre o projeto em portugues",
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {"pergunta": "Como o escore de Alvarado classifica o risco?"}
+        }
+    }
+
+
+class DuvidaResponse(BaseModel):
+    """Resposta gerada pela LLM com base na documentacao do projeto."""
+
+    pergunta: str
+    resposta: str
+    contexto_utilizado: list[str] = []
+    modelo: str
 
 
 # ── Errors ──────────────────────────────────────────────────

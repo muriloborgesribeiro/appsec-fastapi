@@ -1,17 +1,18 @@
 import os
 import sys
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import (
     BASE_DIR,
-    STATIC_DIR,
-    CORS_ORIGINS,
     CORS_ALLOW_CREDENTIALS,
-    CORS_METHODS,
     CORS_HEADERS,
+    CORS_METHODS,
+    CORS_ORIGINS,
+    STATIC_DIR,
 )
 
 sys.path.insert(0, BASE_DIR)
@@ -19,10 +20,10 @@ sys.path.insert(0, BASE_DIR)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    from app.database import SessionLocal, Base, engine
     from app.auth.models import User
     from app.auth.utils import hash_password
-    from app.config import ADMIN_USERNAME, ADMIN_EMAIL, ADMIN_PASSWORD
+    from app.config import ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_USERNAME
+    from app.database import Base, SessionLocal, engine
 
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
@@ -40,6 +41,9 @@ async def lifespan(app: FastAPI):
             db.commit()
     finally:
         db.close()
+    from app.services.rag_service import get_document_store
+
+    get_document_store().carregar()
     yield
 
 
@@ -55,6 +59,10 @@ tags_metadata = [
     {
         "name": "metricas",
         "description": "Métricas de desempenho dos modelos de Machine Learning (Acurácia, Precisão, Recall, F1-Score, matriz de confusão).",
+    },
+    {
+        "name": "duvidas",
+        "description": "Tira duvidas sobre o projeto usando RAG + Groq. Envia uma pergunta em linguagem natural e recebe resposta baseada na documentação.",
     },
     {
         "name": "health",
@@ -167,11 +175,13 @@ if os.path.exists(STATIC_DIR):
 
 
 # ── Routers ─────────────────────────────────────────────────
-from app.routers import api
 from app.auth import router as auth_router
+from app.routers import api
+from app.routers import duvidas as duvidas_router
 
 app.include_router(api.router)
 app.include_router(api.metricas_router)
+app.include_router(duvidas_router.router)
 app.include_router(auth_router.router)
 
 
