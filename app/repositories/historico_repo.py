@@ -1,9 +1,7 @@
 from datetime import datetime, timedelta
-from typing import Optional
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 
 from app.models import DiagnosisHistory
 
@@ -42,7 +40,7 @@ class HistoryRepository:
         self.db.refresh(historico)
         return historico
 
-    def find_by_id(self, diagnostico_id: int) -> Optional[DiagnosisHistory]:
+    def find_by_id(self, diagnostico_id: int) -> DiagnosisHistory | None:
         return (
             self.db.query(DiagnosisHistory)
             .filter(DiagnosisHistory.id == diagnostico_id)
@@ -59,11 +57,11 @@ class HistoryRepository:
         self,
         page: int = 1,
         page_size: int = 20,
-        data_inicio: Optional[str] = None,
-        data_fim: Optional[str] = None,
-        classificacao: Optional[str] = None,
-        resultado_knn: Optional[str] = None,
-        resultado_svm: Optional[str] = None,
+        data_inicio: str | None = None,
+        data_fim: str | None = None,
+        classificacao: str | None = None,
+        resultado_knn: str | None = None,
+        resultado_svm: str | None = None,
     ):
         query = self.db.query(DiagnosisHistory)
 

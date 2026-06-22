@@ -43,8 +43,7 @@ async def perguntar(
     if not chunks or chunks[0]["score"] < RAG_SIMILARIDADE_MINIMA:
         return DuvidaResponse(
             pergunta=payload.pergunta,
-            resposta="A pergunta não tem relação com o escopo do projeto. "
-            "Faça uma pergunta pertinente.",
+            resposta="Essa pergunta não está relacionada ao projeto APPSPEC.",
             contexto_utilizado=[],
             modelo=GROQ_MODEL,
         )
@@ -68,7 +67,8 @@ async def perguntar(
     except APITimeoutError:
         raise HTTPException(
             status_code=503,
-            detail="O serviço de IA esta demorando mais que o esperado. Tente novamente.",
+            detail="O servico de IA esta demorando mais que o esperado. "
+            "Tente novamente.",
         ) from None
     except Exception:
         raise HTTPException(

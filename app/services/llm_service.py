@@ -1,4 +1,4 @@
-from openai import OpenAI, APITimeoutError
+from openai import OpenAI
 
 from app.config import GROQ_API_KEY, GROQ_BASE_URL, GROQ_MODEL, RAG_TEMPERATURE
 
@@ -14,8 +14,8 @@ _SYSTEM_PROMPT = (
     "nao estejam no contexto ou no seu conhecimento estabelecido.\n"
     "4. Cite a fonte (arquivo) quando a informacao vier do contexto.\n"
     "5. Responda em portugues brasileiro de forma clara e objetiva.\n"
-    "6. Formate a resposta usando Markdown: use **negrito** para conceitos importantes, "
-    "topicos com - para listas, e ``` para codigo ou exemplos numericos.\n"
+    "6. Formate a resposta usando Markdown: use **negrito** para conceitos importantes,"
+    " topicos com - para listas, e ``` para codigo ou exemplos numericos.\n"
     "7. Se a pergunta pedir comparacao entre modelos (ex: KNN vs SVM), "
     "apresente em topicos lado a lado.\n\n"
     "CONTEXTO:\n{contexto}"

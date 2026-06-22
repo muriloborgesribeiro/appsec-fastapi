@@ -6,9 +6,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from app.config import (
+    AUTH_SRC_DIR,
     DOCS_DIR,
     ML_SRC_DIR,
-    AUTH_SRC_DIR,
     RAG_CHUNK_OVERLAP,
     RAG_CHUNK_SIZE,
     RAG_TOP_K,

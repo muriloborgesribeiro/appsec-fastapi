@@ -1,9 +1,9 @@
-from fastapi import Depends, HTTPException, status, Request
+from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
-from app.database import get_db
-from app.auth.utils import decode_token
 from app.auth.models import User
+from app.auth.utils import decode_token
+from app.database import get_db
 
 
 def _decode_user_from_token(db: Session, token: str) -> User | None:

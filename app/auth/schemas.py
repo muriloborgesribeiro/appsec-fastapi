@@ -1,5 +1,5 @@
+
 from pydantic import BaseModel, Field
-from typing import Optional
 
 
 class UserCreate(BaseModel):
@@ -82,5 +82,5 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     """Dados decodificados do token JWT."""
 
-    username: Optional[str] = None
-    role: Optional[str] = None
+    username: str | None = None
+    role: str | None = None

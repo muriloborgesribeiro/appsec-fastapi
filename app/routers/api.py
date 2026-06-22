@@ -1,26 +1,26 @@
-import os
 import json
+import os
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import Optional
 
+from app.auth.dependencies import require_role
+from app.config import METRICAS_PATH
 from app.database import get_db
 from app.repositories.historico_repo import HistoryRepository
-from app.config import METRICAS_PATH
 from app.schemas import (
+    AlvaradoDetalhe,
+    AlvaradoResult,
     DiagnosticoRequest,
     DiagnosticoResponse,
-    DiagnosticoSummary,
     DiagnosticosListResponse,
-    Link,
+    DiagnosticoSummary,
     ErrorResponse,
-    AlvaradoResult,
-    AlvaradoDetalhe,
     KnnResult,
+    Link,
     SvmResult,
 )
-from app.services.ml_service import executar_modelos, criar_historico
-from app.auth.dependencies import require_role
+from app.services.ml_service import criar_historico, executar_modelos
 
 router = APIRouter(prefix="/api/v1", tags=["diagnosticos"])
 
@@ -139,19 +139,19 @@ async def listar_diagnosticos(
     _=Depends(require_role("admin", "professional", "viewer")),
     page: int = Query(1, ge=1, description="Número da página (começa em 1)"),
     page_size: int = Query(20, ge=1, le=100, description="Itens por página (máx. 100)"),
-    data_inicio: Optional[str] = Query(
+    data_inicio: str | None = Query(
         None, description="Filtrar por data início (formato: YYYY-MM-DD)"
     ),
-    data_fim: Optional[str] = Query(
+    data_fim: str | None = Query(
         None, description="Filtrar por data fim (formato: YYYY-MM-DD)"
     ),
-    classificacao: Optional[str] = Query(
+    classificacao: str | None = Query(
         None, description="Filtrar por classificação Alvarado (ex: Alta Probabilidade)"
     ),
-    resultado_knn: Optional[str] = Query(
+    resultado_knn: str | None = Query(
         None, description="Filtrar por resultado KNN (0 = negativo, 1 = positivo)"
     ),
-    resultado_svm: Optional[str] = Query(
+    resultado_svm: str | None = Query(
         None, description="Filtrar por resultado SVM (0 = negativo, 1 = positivo)"
     ),
 ):
@@ -337,5 +337,5 @@ async def metricas_json(
             status_code=404,
             detail="Métricas não encontradas. Execute setup.py primeiro.",
         )
-    with open(METRICAS_PATH, "r", encoding="utf-8") as f:
+    with open(METRICAS_PATH, encoding="utf-8") as f:
         return json.load(f)

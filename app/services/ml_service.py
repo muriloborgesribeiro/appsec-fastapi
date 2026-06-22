@@ -1,12 +1,11 @@
 from sqlalchemy.orm import Session
 
-from app.models import DiagnosisHistory
 from app.config import KNN_MODEL_PATH, SVM_MODEL_PATH
+from app.models import DiagnosisHistory
 from app.repositories.historico_repo import HistoryRepository
 from ml.alvarado import AlvaradoMotor
 from ml.knn_engine import KnnMotor
 from ml.svm_engine import SvmMotor
-
 
 MAPA_SPEC_PARA_DATASET = {
     "dor_migratoria": "Migratory_Pain",
