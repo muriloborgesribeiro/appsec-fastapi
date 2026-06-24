@@ -59,10 +59,18 @@ ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@appsec.local")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin12")
 
+# ── Logging ───────────────────────────────────────────────
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+LOG_BUFFER_SIZE = int(os.getenv("LOG_BUFFER_SIZE", "200"))
+
 # ── Groq / LLM ─────────────────────────────────────────────
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
-GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+if GROQ_API_KEY.startswith("xai-"):
+    GROQ_MODEL = os.getenv("GROQ_MODEL", "grok-beta")
+    GROQ_BASE_URL = "https://api.x.ai/v1"
+else:
+    GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+    GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
 # ── RAG ─────────────────────────────────────────────────────
 DOCS_DIR = os.path.join(BASE_DIR, "specs")

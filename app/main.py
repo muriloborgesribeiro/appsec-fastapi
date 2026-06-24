@@ -20,6 +20,11 @@ sys.path.insert(0, BASE_DIR)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    from app.logging_config import configurar_logging, get_logger
+
+    configurar_logging()
+    get_logger("appspec.startup").info("Iniciando APPSPEC API")
+
     from app.auth.models import User
     from app.auth.utils import hash_password
     from app.config import ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_USERNAME
@@ -38,6 +43,25 @@ async def lifespan(app: FastAPI):
                 is_active=True,
             )
             db.add(admin)
+            
+            prof = User(
+                username="medico_01",
+                email="medico@appspec.local",
+                hashed_password=hash_password("senha123"),
+                role="professional",
+                is_active=True,
+            )
+            db.add(prof)
+
+            viewer = User(
+                username="estudante_01",
+                email="estudante@appspec.local",
+                hashed_password=hash_password("senha123"),
+                role="viewer",
+                is_active=True,
+            )
+            db.add(viewer)
+            
             db.commit()
     finally:
         db.close()
@@ -74,6 +98,10 @@ tags_metadata = [
         "name": "health",
         "description": "Health check da aplicação.",
     },
+    {
+        "name": "logs",
+        "description": "Logs de execução e monitoramento da aplicação (admin).",
+    },
 ]
 
 app = FastAPI(
@@ -108,6 +136,7 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     docs_url="/docs",
     redoc_url="/redoc",
+    swagger_ui_parameters={"filter": True, "persistAuthorization": True},
 )
 
 
@@ -179,6 +208,41 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app.add_middleware(SecurityHeadersMiddleware)
 
 
+# ── Request Logging ─────────────────────────────────────────
+# Tecnico: registra cada requisicao (metodo, rota, status, tempo) e os erros.
+# Clinico: anota no livro de ocorrencias toda visita ao plantao.
+import time
+
+from app.logging_config import get_logger
+
+_req_log = get_logger("appspec.request")
+
+
+class RequestLoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        inicio = time.perf_counter()
+        try:
+            response = await call_next(request)
+        except Exception:
+            ms = (time.perf_counter() - inicio) * 1000
+            _req_log.error(
+                f"{request.method} {request.url.path} -> 500 ({ms:.0f}ms)"
+            )
+            raise
+        ms = (time.perf_counter() - inicio) * 1000
+        linha = f"{request.method} {request.url.path} -> {response.status_code} ({ms:.0f}ms)"
+        if response.status_code >= 500:
+            _req_log.error(linha)
+        elif response.status_code >= 400:
+            _req_log.warning(linha)
+        else:
+            _req_log.info(linha)
+        return response
+
+
+app.add_middleware(RequestLoggingMiddleware)
+
+
 # ── Static files ───────────────────────────────────────────
 if os.path.exists(STATIC_DIR):
     from fastapi.staticfiles import StaticFiles
@@ -190,11 +254,13 @@ if os.path.exists(STATIC_DIR):
 from app.auth import router as auth_router
 from app.routers import api
 from app.routers import duvidas as duvidas_router
+from app.routers import logs as logs_router
 
 app.include_router(api.router)
 app.include_router(api.metricas_router)
 app.include_router(duvidas_router.router)
 app.include_router(auth_router.router)
+app.include_router(logs_router.router)
 
 
 # ── Health ──────────────────────────────────────────────────
