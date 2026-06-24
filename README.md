@@ -9,7 +9,8 @@ API REST para apoio ao diagnóstico de apendicite aguda, combinando **Escala de 
 ---
 
 ## Índice
-
+- [Documentação completa da API](https://appsec-fastapi.onrender.com/docs)
+- [Acesso ao frontend](https://appsec-fastapi-frontend.onrender.com/)
 - [Arquitetura](#arquitetura)
 - [Stack Tecnológico](#stack-tecnológico)
 - [Estrutura do Projeto](#estrutura-do-projeto)
