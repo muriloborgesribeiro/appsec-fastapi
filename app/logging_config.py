@@ -7,6 +7,7 @@ Clinico: e o "livro de ocorrencias" do plantao. Tudo que acontece fica
          registrado, e o administrador pode consultar as ultimas anotacoes.
 """
 
+import contextlib
 import logging
 import os
 import sys
@@ -29,7 +30,9 @@ class BufferLogHandler(logging.Handler):
     """
 
     def emit(self, record: logging.LogRecord) -> None:
-        try:
+        with contextlib.suppress(
+            Exception
+        ):  # nunca deixar o logging quebrar a aplicacao
             _LOG_BUFFER.append(
                 {
                     "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -38,8 +41,6 @@ class BufferLogHandler(logging.Handler):
                     "mensagem": record.getMessage(),
                 }
             )
-        except Exception:  # nunca deixar o logging quebrar a aplicacao
-            pass
 
 
 def configurar_logging() -> None:

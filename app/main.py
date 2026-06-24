@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
                 is_active=True,
             )
             db.add(admin)
-            
+
             prof = User(
                 username="medico_01",
                 email="medico@appspec.local",
@@ -61,7 +61,7 @@ async def lifespan(app: FastAPI):
                 is_active=True,
             )
             db.add(viewer)
-            
+
             db.commit()
     finally:
         db.close()
@@ -230,7 +230,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             )
             raise
         ms = (time.perf_counter() - inicio) * 1000
-        linha = f"{request.method} {request.url.path} -> {response.status_code} ({ms:.0f}ms)"
+        linha = f"{request.method} {request.url.path} -> {response.status_code} ({ms:.0f}ms)"  # noqa: E501
         if response.status_code >= 500:
             _req_log.error(linha)
         elif response.status_code >= 400:
