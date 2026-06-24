@@ -35,7 +35,7 @@ A interface web é construída com **Jinja2 Templates** renderizados no servidor
 - Navbar Bootstrap 5 com links para todas as páginas
 - Container responsivo (`container-fluid`)
 - Bloco `{% block content %}` para conteúdo específico
-- Footer com créditos: "Disciplina: Agentes Inteligentes — UFG | Prof. Ronaldo Martins da Costa"
+- Footer com créditos: "Disciplina: Construção de APIs para Inteligência Artificial, — UFG | Prof. Rogério Rodrigues Carvalho"
 - Inclusão de Bootstrap 5 CSS/JS via CDN
 
 ### 3.2 `index.html` — Formulário Clínico

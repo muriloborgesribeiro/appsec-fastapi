@@ -36,7 +36,7 @@ Presente em todas as páginas via HTML hardcoded no template (`base.html`):
 ```html
 <div class="disclaimer-global">
     AVISO: Este sistema é uma ferramenta de apoio didática
-    desenvolvida na disciplina de Agentes Inteligentes (UFG).
+    desenvolvida na disciplina de Construção de APIs para Inteligência Artificial, (UFG).
     NÃO substitui avaliação médica presencial.
     NÃO deve ser usado para decisão clínica real.
     Sistema exclusivamente educacional.

@@ -6,9 +6,11 @@ from app.auth.models import User
 from app.auth.schemas import LoginRequest, Token, UserCreate, UserResponse
 from app.auth.utils import create_access_token, hash_password, verify_password
 from app.database import get_db
+from app.logging_config import get_logger
 from app.schemas import ErrorResponse
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+_auth_log = get_logger("appspec.auth")
 
 
 @router.post(
@@ -73,16 +75,19 @@ async def login(payload: LoginRequest, db: Session = Depends(get_db)):
     """
     user = db.query(User).filter(User.username == payload.username).first()
     if not user or not verify_password(payload.password, user.hashed_password):  # type: ignore[arg-type]
+        _auth_log.warning(f"Login falhou para usuario '{payload.username}'")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Credenciais invalidas",
         )
     if not user.is_active:
+        _auth_log.warning(f"Login negado (usuario inativo) '{payload.username}'")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Usuario inativo",
         )
     token = create_access_token(data={"sub": user.username, "role": user.role})
+    _auth_log.info(f"Login bem-sucedido para '{user.username}' (role={user.role})")
     return Token(access_token=token)
 
 

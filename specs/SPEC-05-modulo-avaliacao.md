@@ -115,8 +115,8 @@ METRICAS = {
 OWS_TEMPLATE = """<?xml version='1.0' encoding='utf-8'?>
 <scheme version="2.0" title="APPSPEC - Validação KNN Apendicite" 
         description="Workflow gerado automaticamente pelo APPSPEC
-        Disciplina: Agentes Inteligentes - UFG
-        Prof. Ronaldo Martins da Costa">
+        Disciplina: Construção de APIs para Inteligência Artificial, - UFG
+        Prof. Rogério Rodrigues Carvalho">
   <nodes>
     <node id="0" name="File" ... />          <!-- Carrega regensburg_processed.csv -->
     <node id="1" name="Preprocess" ... />    <!-- Normalização Min-Max -->

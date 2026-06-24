@@ -10,7 +10,7 @@
 
 ## 1. Resumo
 
-O APPSPEC é um sistema web para apoio didático ao diagnóstico de apendicite aguda, desenvolvido como trabalho final da disciplina Agentes Inteligentes (UFG). O sistema implementa três motores de classificação — Alvarado Score (determinístico), KNN (Machine Learning) e SVM (Machine Learning) — e os apresenta lado a lado para comparação pedagógica. A aplicação segue uma arquitetura em 4 camadas com API RESTful documentada via OpenAPI/Swagger.
+O APPSPEC é um sistema web para apoio didático ao diagnóstico de apendicite aguda, desenvolvido como trabalho final da disciplina Construção de APIs para Inteligência Artificial, (UFG). O sistema implementa três motores de classificação — Alvarado Score (determinístico), KNN (Machine Learning) e SVM (Machine Learning) — e os apresenta lado a lado para comparação pedagógica. A aplicação segue uma arquitetura em 4 camadas com API RESTful documentada via OpenAPI/Swagger.
 
 ---
 
