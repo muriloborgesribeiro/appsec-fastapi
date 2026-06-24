@@ -122,11 +122,11 @@ app = FastAPI(
     "diagnósticos e gerenciar usuários)\n"
     "- **professional**: Pode criar e listar diagnósticos\n"
     "- **viewer**: Acesso somente leitura (listar diagnósticos e métricas)\n\n"
-    "> Projeto didático para a disciplina **Agentes Inteligentes** — UFG.",
+    "> Projeto didático para a disciplina **Construção de APIs para Inteligência Artificial,** — UFG.",
     version="1.2.0",
     lifespan=lifespan,
     contact={
-        "name": "UFG — Agentes Inteligentes",
+        "name": "UFG — Construção de APIs para Inteligência Artificial,",
         "url": "https://ufg.br",
     },
     license_info={

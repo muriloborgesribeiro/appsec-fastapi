@@ -28,7 +28,7 @@ DISCLAIMER_SVM = (
     "AVISO: Este resultado e gerado por um modelo de Machine Learning (SVM) "
     "treinado no dataset Regensburg (Marcinkevics et al., 2023). "
     "NAO substitui avaliacao medica presencial. "
-    "Sistema exclusivamente didatico -- disciplina de Agentes Inteligentes (UFG)."
+    "Sistema exclusivamente didatico -- disciplina de Construção de APIs para Inteligência Artificial, (UFG)."
 )
 
 

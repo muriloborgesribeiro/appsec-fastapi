@@ -294,7 +294,7 @@ def _gerar_imagem_matriz(
     ax.set_ylabel("Diagnostico Real", fontsize=13, fontweight="bold", labelpad=10)
     ax.set_title(
         f"Matriz de Confusao -- {nome_modelo} (scikit-learn)\n"
-        "Disciplina: Agentes Inteligentes -- UFG",
+        "Disciplina: Construção de APIs para Inteligência Artificial, -- UFG",
         fontsize=13,
         fontweight="bold",
         pad=15,
@@ -349,7 +349,7 @@ def gerar_orange_ows(dataset_path: str, output_path: str) -> None:
 <scheme version="2.0"
         title="APPSPEC - Validacao KNN (Apendicite)"
         description="Workflow Orange3 gerado automaticamente pelo setup.py do APPSPEC.
-Disciplina: Agentes Inteligentes - UFG - Prof. Ronaldo Martins da Costa.
+Disciplina: Construção de APIs para Inteligência Artificial, - UFG - Prof. Rogério Rodrigues Carvalho.
 Pipeline: Dataset Regensburg -> Pre-processamento -> KNN -> Matriz de Confusao.
 Tecnologia: Orange3 (validacao visual no-code, ensinada na disciplina).">
     <nodes>
@@ -375,7 +375,7 @@ Tecnologia: Orange3 (validacao visual no-code, ensinada na disciplina).">
     </links>
     <annotations>
         <text id="0" rect="(50, 50, 500, 100)">APPSPEC - Workflow de Validacao Visual
-Tecnologia: Orange3 (disciplina de Agentes Inteligentes)
+Tecnologia: Orange3 (disciplina de Construção de APIs para Inteligência Artificial,)
 Dataset: {os.path.basename(dataset_path)}
 Algoritmo: KNN (K-Nearest Neighbors) - Cover and Hart, 1967</text>
     </annotations>
@@ -396,7 +396,7 @@ def gerar_curva_roc(y_real, y_prob, output_path: str, nome_modelo: str = "KNN") 
     """
     Gera Curva ROC com AUC e ponto otimo de Youden.
 
-    Ensinada na Aula 5 (slide 21, Prof. Ronaldo Martins da Costa):
+    Ensinada na Aula 5 (slide 21, Prof. Rogério Rodrigues Carvalho):
       - Eixo X: Taxa de Falso Positivo (FPR = 1 - Especificidade)
       - Eixo Y: Taxa de Verdadeiro Positivo (TPR = Sensibilidade)
       - AUC: Area sob a curva (quanto maior, melhor)
@@ -464,7 +464,7 @@ def gerar_curva_roc(y_real, y_prob, output_path: str, nome_modelo: str = "KNN") 
         fontweight="bold",
     )
     ax.set_title(
-        f"Curva ROC -- {nome_modelo}\nDisciplina: Agentes Inteligentes -- UFG",
+        f"Curva ROC -- {nome_modelo}\nDisciplina: Construção de APIs para Inteligência Artificial, -- UFG",
         fontsize=12,
         fontweight="bold",
     )
@@ -511,7 +511,7 @@ def gerar_curva_pr(y_real, y_prob, output_path: str, nome_modelo: str = "KNN") -
     """
     Gera Curva Precision-Recall com Average Precision.
 
-    Ensinada na Aula 5 (slides 22-24, Prof. Ronaldo Martins da Costa):
+    Ensinada na Aula 5 (slides 22-24, Prof. Rogério Rodrigues Carvalho):
       - Eixo X: Recall (Sensibilidade) = VP / (VP + FN)
       - Eixo Y: Precision (VPP) = VP / (VP + FP)
       - AP: Average Precision (area sob a curva PR)
@@ -566,7 +566,7 @@ def gerar_curva_pr(y_real, y_prob, output_path: str, nome_modelo: str = "KNN") -
     ax.set_ylabel("Precision (VPP = VP / (VP + FP))", fontsize=11, fontweight="bold")
     ax.set_title(
         f"Curva Precision-Recall -- {nome_modelo}\n"
-        "Disciplina: Agentes Inteligentes -- UFG",
+        "Disciplina: Construção de APIs para Inteligência Artificial, -- UFG",
         fontsize=12,
         fontweight="bold",
     )
@@ -659,7 +659,7 @@ def gerar_curvas_comparativas(modelos_dados: list, output_dir: str) -> dict:
     )
     ax_roc.set_title(
         "Curva ROC Comparativa -- Alvarado vs KNN vs SVM\n"
-        "Disciplina: Agentes Inteligentes -- UFG",
+        "Disciplina: Construção de APIs para Inteligência Artificial, -- UFG",
         fontsize=13,
         fontweight="bold",
     )
@@ -714,7 +714,7 @@ def gerar_curvas_comparativas(modelos_dados: list, output_dir: str) -> dict:
     ax_pr.set_ylabel("Precision (VPP)", fontsize=12, fontweight="bold")
     ax_pr.set_title(
         "Curva Precision-Recall Comparativa -- Alvarado vs KNN vs SVM\n"
-        "Disciplina: Agentes Inteligentes -- UFG",
+        "Disciplina: Construção de APIs para Inteligência Artificial, -- UFG",
         fontsize=13,
         fontweight="bold",
     )

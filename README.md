@@ -4,7 +4,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688)](https://fastapi.tiangolo.com)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-API REST para apoio ao diagnóstico de apendicite aguda, combinando **Escala de Alvarado** (determinístico), **KNN** e **SVM** (Machine Learning), com **RAG + Groq** para tirar dúvidas sobre o projeto. Projeto didático da disciplina **Agentes Inteligentes** — UFG.
+API REST para apoio ao diagnóstico de apendicite aguda, combinando **Escala de Alvarado** (determinístico), **KNN** e **SVM** (Machine Learning), com **RAG + Groq** para tirar dúvidas sobre o projeto. Projeto didático da disciplina **Construção de APIs para Inteligência Artificial,** — UFG.
 
 ---
 
@@ -257,7 +257,7 @@ Criados automaticamente no `lifespan` da aplicação (primeira execução):
 
 | Usuário | Senha | Papel |
 |---------|-------|-------|
-| `admin` | `admin12` | admin |
+| `admin` | `admin123` | admin |
 | `medico_01` | `senha123` | professional |
 | `estudante_01` | `senha123` | viewer |
 
@@ -375,7 +375,7 @@ A documentação inclui:
 | Variável | Padrão | Descrição |
 |----------|--------|-----------|
 | `GROQ_API_KEY` | — | Chave da API Groq (ou xAI) para o RAG |
-| `ADMIN_PASSWORD` | `admin12` | Senha do usuário admin inicial |
+| `ADMIN_PASSWORD` | `admin123` | Senha do usuário admin inicial |
 | `CORS_ORIGINS` | `http://localhost:8082` | Origens permitidas (CORS) |
 | `LOG_LEVEL` | `INFO` | Nível de logging |
 | `SECRET_KEY` | chave-dev | Chave para assinatura JWT |
@@ -414,7 +414,7 @@ uv run python app/main.py
 
 O arquivo `render.yaml` contém a configuração para deploy no Render.com com dois serviços:
 - **appspec-backend:** API (este repositório)
-- **appspec-frontend:** Interface web
+- **appspec-frontend:** Interface web (https://github.com/muriloborgesribeiro/appsec-frontend)
 
 ---
 

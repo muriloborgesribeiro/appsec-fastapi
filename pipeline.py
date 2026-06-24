@@ -3,8 +3,8 @@
 # ============================================================
 #  pipeline.py -- Ponto de Entrada Unico do APPSPEC
 #  APPSPEC -- Sistema de Apoio ao Diagnostico de Apendicite
-#  Disciplina: Agentes Inteligentes -- UFG
-#  Prof. Ronaldo Martins da Costa
+#  Disciplina: Construção de APIs para Inteligência Artificial, -- UFG
+#  Prof. Rogério Rodrigues Carvalho
 #
 #  Contrato: SPEC-02 6.2 -- 10 passos automaticos
 #  Execucao: python pipeline.py (sem argumentos, sem interacao)
