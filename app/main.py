@@ -225,9 +225,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
         except Exception:
             ms = (time.perf_counter() - inicio) * 1000
-            _req_log.error(
-                f"{request.method} {request.url.path} -> 500 ({ms:.0f}ms)"
-            )
+            _req_log.error(f"{request.method} {request.url.path} -> 500 ({ms:.0f}ms)")
             raise
         ms = (time.perf_counter() - inicio) * 1000
         linha = f"{request.method} {request.url.path} -> {response.status_code} ({ms:.0f}ms)"  # noqa: E501
